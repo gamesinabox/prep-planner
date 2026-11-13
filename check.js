@@ -11,7 +11,7 @@ const BANK = {}; // every recipe is now a published one; the old bank comparison
 
 const { IMG } = new Function(data + ';return {IMG}')();
 for (const r of [...RECIPES, ...Object.values(BF)]) assert(r.src, r.n + ': no source');
-for (const k of [...RECIPES.map(r => r.id), ...Object.keys(BF)]) assert(IMG[k], k + ': no photo');
+for (const r of [...RECIPES, ...Object.entries(BF).map(([id, b]) => ({ ...b, id }))]) assert(IMG[r.id] || !r.src[1], r.n + ': published recipe with no photo'); // TikTok recipes (no link) use your own photo
 for (const r of [...RECIPES, ...Object.values(BF)])
   for (const k in r.ing) assert(ING[k], `${r.n}: unknown ingredient ${k}`);
 for (const k in ING) { const d = ING[k]; // catches typos; veg/spice carbs include fibre so 4/4/9 runs high there

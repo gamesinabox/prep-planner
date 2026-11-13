@@ -84,6 +84,8 @@ td.r,th.r{text-align:right;white-space:nowrap}
 .opt{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;cursor:pointer}
 .opt .thumb{width:96px;height:96px}
 .opt.on b{color:var(--accent)}
+.nophoto{display:grid;place-items:center;text-align:center;font-size:11px;line-height:1.2;color:var(--muted);padding:4px}
+.photo-row{margin:0 0 10px}
 .tick{color:var(--accent);font-size:20px;font-weight:700}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .thumb{width:64px;height:64px;object-fit:cover;border-radius:8px;flex:none;background:var(--line)}
@@ -193,6 +195,12 @@ const ING={
  beetroot:['Beetroot','g',43,1.6,9.6,0.2,500,'500 g bunch',2.49,'Fruit & veg'],
  pita:['Wholemeal pita bread','g',255,9,50,1.5,350,'5-pack (~350 g)',2.29,'Bakery'],
  bocconcini:['Bocconcini','g',220,17,1,16,220,'220 g tub',4.49,'Fridge'],
+ bacon:['Short cut bacon','g',120,20,1,4,250,'250 g pack',4.49,'Meat & fish'],
+ cheeseLite:['Reduced-fat grated cheese','g',300,30,0.5,20,250,'250 g bag',4.29,'Fridge'],
+ proyog:['Protein yoghurt pot (160 g)','ea',105,15,9,0.3,4,'4-pack',5.49,'Fridge'],
+ almondmilk:['Unsweetened almond milk','ml',15,0.5,0.3,1.2,1000,'1 L carton',1.89,'Fridge'],
+ berries:['Frozen mixed berries','g',45,0.8,8,0.3,500,'500 g bag',4.49,'Freezer'],
+ wheatbix:['Wheat biscuits (Weet-Bix style)','g',356,12.4,67,1.4,750,'750 g box',2.99,'Tins & dry'],
  oil:['Olive oil','g',884,0,0,100,750,'750 ml bottle',8.79,'Pantry',1],
  soy:['Soy sauce','g',53,8.1,4.9,0.6,500,'500 ml bottle',2.29,'Pantry',1],
  honey:['Honey','g',304,0.3,82,0,500,'500 g jar',4.99,'Pantry',1],
@@ -214,6 +222,8 @@ const ING={
  walnuts:['Walnuts','g',654,15,14,65,150,'150 g bag',3.99,'Pantry',1],
  tahini:['Tahini','g',595,17,21,54,375,'375 g jar',4.99,'Pantry',1],
  chutney:['Fruit chutney','g',150,1,36,0.3,250,'250 g jar',2.99,'Pantry',1],
+ perimayo:['Peri-peri or light mayonnaise','g',320,1,8,30,265,'265 g bottle',3.49,'Pantry',1],
+ chocspread:['Hazelnut chocolate spread','g',539,6.3,57.5,31,400,'400 g jar',2.99,'Pantry',1],
  fishsauce:['Fish sauce','g',35,5,3.6,0,200,'200 ml bottle',2.49,'Pantry',1],
  powder:['Protein powder (Myprotein, 30 g scoop)','g',387,75.3,6,6.3,1000,'1 kg bag (33 scoops)',55.00,'Not from Aldi',1],
 };
@@ -360,9 +370,19 @@ const RECIPES=[
   ing:{oil:15,onion:150,capsicum:250,garlic:6,beef:800,tompaste:40,spice:8,rice:250,mixveg:400,spinach:90},
   m:['Heat the oil in a large pot. Cook the onion, capsicum and garlic 1 min.','Brown the mince, breaking it up.','Stir in the tomato paste, cumin, oregano, onion powder, pepper and salt for 1 min.','Add the rice, 550 ml low-salt beef stock, the frozen veg and a bay leaf. Cover and simmer gently 12–15 min until the liquid is absorbed.','Scatter the spinach on top, cover and rest 10 min, then fluff and stir it through.'],
   note:'Source makes 5 serves with 500 g beef; this makes 4 bigger ones with 800 g. Oil cut from 2 tbsp to 1.'},
+ // 36–37: from @alexgamblecoach TikTok videos (on-screen recipe cards), swapped to Aldi products. No public page, so src has no link and no published photo.
+ {id:36,n:'Bolognese loaded potatoes',s:4,min:45,src:['@alexgamblecoach on TikTok',null],
+  ing:{beef:800,potato:1400,passata:600,tomato:200,capsicum:200,cheeseLite:120,oil:8,spice:6},
+  m:['Heat the oven to 220°C (200°C fan). Halve the potatoes lengthways, spray with oil, season with smoked paprika and salt. Roast on a rack or lined tray 35–40 min until crisp.','Brown the mince in a large non-stick pan, breaking it up.','Add the diced capsicum and tomato for 2–3 min, then the passata. Simmer 10 min until thick.','Divide the potatoes and top with the bolognese. Sprinkle the cheese on after reheating.'],
+  note:'Video recipe is one serve: 250 g extra-lean mince, 400 g Spud Lite potatoes, 150 g passata, 50 g tomato, 50 g capsicum, 40 g light cheese (715 kcal, 77 g protein). Scaled to 4 with 800 g mince; Aldi swaps: regular potatoes instead of Spud Lite (more kcal), reduced-fat grated cheese. Method written from what the video shows.'},
+ {id:37,n:'Chicken BLT pasta salad',s:1,min:25,src:['@alexgamblecoach on TikTok',null],
+  ing:{chicken:200,pasta:50,bacon:50,yoghurt:50,lettuce:50,tomato:100,perimayo:20},
+  m:['Cook the pasta, drain and cool under cold water.','Cook the chicken in a non-stick pan 5–6 min a side until cooked through. Dice.','Pan-fry the bacon until crisp, then chop.','Mix the yoghurt and peri-peri mayo as the dressing.','Toss pasta, chicken, bacon, lettuce and tomato with the dressing.'],
+  note:'Video quantities kept (548 kcal, 71 g protein as posted). Aldi swaps: regular pasta instead of Vetta protein pasta (about 6 g less protein), any peri-peri or light mayo instead of Nando\'s. Method written from the ingredient list.'},
 ];
 const BF={
  eggs:{n:'Eggs on toast',src:['RecipeTin Eats (poached eggs)','https://www.recipetineats.com/poached-eggs/'],ing:{egg:3,bread:80},m:['Toast 2 slices wholemeal (80 g).','Scramble or poach 3 eggs in a non-stick pan. No butter.']},
+ weetbix:{n:'Overnight berry Weet-Bix',src:['@alexgamblecoach on TikTok',null],ing:{wheatbix:45,proyog:1,berries:100,almondmilk:150,chocspread:15},m:['The night before, crush 3 wheat biscuits into a jar or container.','Pour over 150 ml almond milk and let it soak in.','Spoon the protein yoghurt on top, then the frozen berries. Fridge overnight.','Add 15 g hazelnut spread in the morning.']},
  oats:{n:'Protein oats',src:['Heart Foundation (hot oats)','https://www.heartfoundation.org.au/recipes/hot-oats'],ing:{oats:70,powder:30,yoghurt:100},m:['Microwave 70 g oats with about 250 ml water for 2–3 min, stirring halfway.','Cool 1 min, stir in a 30 g scoop of protein powder, top with 100 g Greek yoghurt.']},
 };
 // Photos load from the recipe sites themselves (not copied here); the service worker keeps a copy on the phone for offline.
@@ -484,7 +504,19 @@ function nextWeek(){
 }
 
 /* ---------- Plan ---------- */
-const pic=id=>IMG[id]?`<img class="thumb" src="${IMG[id]}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:'';
+/* ---------- your own photos: kept in this phone's IndexedDB only, never uploaded ---------- */
+const PHOTOS={};
+const tx=(mode,fn)=>new Promise((ok,no)=>{const o=indexedDB.open('prep-photos',1);o.onupgradeneeded=()=>o.result.createObjectStore('p');o.onerror=()=>no(o.error);
+  o.onsuccess=()=>{const t=o.result.transaction('p',mode),r=fn(t.objectStore('p'));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>no(t.error)}});
+async function loadPhotos(){try{for(const k of await tx('readonly',s=>s.getAllKeys()))PHOTOS[k]=URL.createObjectURL(await tx('readonly',s=>s.get(k)))}catch(e){}}
+async function shrink(file){const im=await createImageBitmap(file),k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');
+  c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',0.8))}
+async function savePhoto(id,file){
+  try{const b=await shrink(file);await tx('readwrite',s=>s.put(b,id));if(PHOTOS[id])URL.revokeObjectURL(PHOTOS[id]);PHOTOS[id]=URL.createObjectURL(b);renderAll()}
+  catch(e){alert('That photo could not be saved. Try another one, or free up space on your phone.')}}
+async function removePhoto(id){try{await tx('readwrite',s=>s.delete(id))}catch(e){}if(PHOTOS[id])URL.revokeObjectURL(PHOTOS[id]);delete PHOTOS[id];renderAll()}
+const imgSrc=id=>PHOTOS[id]||IMG[id];
+const pic=id=>imgSrc(id)?`<img class="thumb" src="${imgSrc(id)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:'<span class="thumb nophoto">No photo yet</span>';
 const meal=id=>RB[id]||Object.assign({s:1,id},BF[id]);
 const metaTxt=r=>{const m=pp(r);return `${Math.round(m[0])} kcal · ${Math.round(m[1])} g protein · ${money(cpp(r))}${m[1]<40?' · lower protein':''}`};
 const ids=k=>k==='bf'?Object.keys(BF):RECIPES.filter(r=>k==='salad'?r.s===1:r.s===4).map(r=>r.id);
@@ -561,9 +593,11 @@ function renderShop(){
 
 /* ---------- Cook ---------- */
 function ingList(r){return `<ul>${Object.entries(r.ing).map(([k,q])=>`<li>${ING[k][1]==='ea'?q+' × '+ING[k][0].toLowerCase():amt(k,q)+' '+ING[k][0].toLowerCase()}</li>`).join('')}</ul>`}
-function photo(id){const r=RB[id]||BF[id];return IMG[id]?`<figure class="hero"><img src="${IMG[id]}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"><figcaption>Photo: ${r.src[0]}</figcaption></figure>`:''}
+function photo(id){const r=meal(id),own=PHOTOS[id],u=imgSrc(id);
+  return (u?`<figure class="hero"><img src="${u}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"><figcaption>${own?'Your photo':'Photo: '+r.src[0]}</figcaption></figure>`:'')
+   +`<p class="row noprint photo-row"><label class="btn ghost">${own?'Change your photo':'Add your own photo'}<input type="file" accept="image/*" class="sr" data-photo="${id}"></label>${own?` <button class="btn ghost" data-unphoto="${id}">Remove your photo</button>`:''}</p>`}
 function card(r,when,portion){const m=pp(r);return `<article class="card">${photo(r.id)}<h3>${r.n}</h3><p class="meta">${when} · about ${r.min} min · makes ${r.s}</p>
-  <p class="macros">${line(m)} per portion</p><h4>Ingredients</h4>${ingList(r)}<h4>Method</h4><ol>${r.m.map(s=>`<li>${s}</li>`).join('')}</ol>${r.note?`<p class="note">${r.note}</p>`:''}${r.src?`<p class="note">Original recipe: <a href="${r.src[1]}" target="_blank" rel="noopener">${r.src[0]}</a></p>`:''}<p class="portion">${portion}</p></article>`}
+  <p class="macros">${line(m)} per portion</p><h4>Ingredients</h4>${ingList(r)}<h4>Method</h4><ol>${r.m.map(s=>`<li>${s}</li>`).join('')}</ol>${r.note?`<p class="note">${r.note}</p>`:''}${r.src?`<p class="note">Original recipe: ${r.src[1]?`<a href="${r.src[1]}" target="_blank" rel="noopener">${r.src[0]}</a>`:r.src[0]}</p>`:''}<p class="portion">${portion}</p></article>`}
 const raw=r=>MEAT.filter(k=>r.ing[k]).map(k=>`${amt(k,r.ing[k])} ${ING[k][0].toLowerCase()}`).join(' and ');
 function renderCook(){
   const tue=src('tue'),thu=src('thu'),sun=src('sun'),sal=src('salad'),b=BF[S.plan.bf];
@@ -686,6 +720,7 @@ document.addEventListener('change',e=>{
   const el=e.target;
   if(el.id==='shake'){S.plan.shake=el.checked;save();renderAll()}
   else if(el.dataset.tick){S.ticks[el.dataset.tick]=el.checked;save()}
+  else if(el.dataset.photo&&el.files[0])savePhoto(el.dataset.photo,el.files[0]);
   else if(el.dataset.price){S.prices[el.dataset.price]=el.value;save();renderAll()}
   else if(el.dataset.me){const k=el.dataset.me;S.me[k]=k==='sex'?el.value:+el.value;S.me.set=true;
     if(k==='goal'){const ws=wstats();S.me.reached=!!ws&&ws.avg7<=S.me.goal}
@@ -696,6 +731,7 @@ document.addEventListener('click',e=>{
   if(t===d||(c&&'close' in c.dataset)){d.close();return}  // tap outside the list or Close
   if(c&&c.dataset.choose){openPicker(c.dataset.choose);return}
   if(c&&c.dataset.pick){const k=d.dataset.slot;S.plan[k]=k==='bf'?c.dataset.pick:+c.dataset.pick;save();d.close();renderAll();return}
+  if(t.dataset.unphoto){removePhoto(t.dataset.unphoto);return}
   if(t.dataset.tab){document.querySelectorAll('nav button').forEach(b=>b===t?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
     document.querySelectorAll('main>section').forEach(s=>s.hidden=s.id!=='tab-'+t.dataset.tab);window.scrollTo(0,0);try{localStorage.setItem('prep-tab',t.dataset.tab)}catch(err){}}
   else if(t.id==='nextweek'){nextWeek();save();renderAll();$('#nextweek').textContent='Done. Next week started'}
@@ -706,7 +742,7 @@ document.addEventListener('click',e=>{
   else if(t.dataset.adj){S.me.adj=t.dataset.adj==='reset'?0:S.me.adj+ +t.dataset.adj;save();renderAll()}
   else if(t.id==='resetprices'){S.prices={};save();renderMe();renderAll()}
 });
-renderMe();renderAll();
+renderMe();renderAll();loadPhotos().then(()=>{if(Object.keys(PHOTOS).length)renderAll()});
 // print() is blocked inside an embedded viewer, so only show Print when running as its own page
 if(window.top!==window.self)document.head.insertAdjacentHTML('beforeend','<style>.printbtn{display:none}</style>');
 try{const tab=localStorage.getItem('prep-tab');if(tab)document.querySelector(`nav button[data-tab="${tab}"]`)?.click()}catch(e){}
