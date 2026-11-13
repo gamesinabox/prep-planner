@@ -1,0 +1,424 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prep"><meta name="theme-color" content="#1f6b4f">
+<link rel="manifest" href="manifest.webmanifest"></head><body>
+<title>Aldi Prep Planner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: single column phone app, fixed bottom tab bar, cards only for recipes. System fonts on purpose: it must work offline. */
+:root{
+  --bg:#f3f6f4;--surface:#ffffff;--fg:#16201c;--muted:#5a6a63;--line:#d9e2dd;
+  --accent:#1f6b4f;--accent-ink:#ffffff;--accent-soft:#e2efe9;
+  --ok:#2c7a46;--warn:#9a5b00;--bad:#b3261e;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1412;--surface:#17201c;--fg:#e4ebe7;--muted:#98a9a1;--line:#2a3631;
+  --accent:#5cc49a;--accent-ink:#06130d;--accent-soft:#1b2e26;
+  --ok:#6fcf8f;--warn:#f0b44c;--bad:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1412;--surface:#17201c;--fg:#e4ebe7;--muted:#98a9a1;--line:#2a3631;
+  --accent:#5cc49a;--accent-ink:#06130d;--accent-soft:#1b2e26;
+  --ok:#6fcf8f;--warn:#f0b44c;--bad:#ff8a80;color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--font);-webkit-text-size-adjust:100%}
+main{max-width:720px;margin:0 auto;padding-block:12px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:22px;margin:4px 0 2px;letter-spacing:-.01em}
+h2{font-size:18px;margin:22px 0 8px;text-wrap:balance}
+h3{font-size:16px;margin:0}
+h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 4px}
+p{margin:6px 0}
+.sub{color:var(--muted);font-size:13px;margin:0 0 10px}
+.num,table,.macros{font-variant-numeric:tabular-nums}
+nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav button{appearance:none;border:0;background:none;color:var(--muted);font:600 13px var(--font);padding:12px 0 14px;cursor:pointer}
+nav button[aria-current="page"]{color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+nav button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.field{display:grid;gap:4px;margin:14px 0 0}
+.field>span{font-weight:600}
+select,input{width:100%;font:16px var(--font);padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg)}
+.hint{font-size:13px;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{appearance:none;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:600 14px var(--font);padding:10px 14px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:none;color:var(--accent)}
+.switch{display:flex;gap:10px;align-items:center;margin-top:14px;font-weight:600}
+.switch input{width:22px;height:22px;accent-color:var(--accent)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.r,th.r{text-align:right;white-space:nowrap}
+.shop{list-style:none;padding:0;margin:0}
+.shop li{border-bottom:1px solid var(--line)}
+.shop label{display:grid;grid-template-columns:28px 1fr auto;gap:8px;padding:10px 0;align-items:start;cursor:pointer}
+.shop input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--accent)}
+.shop input:checked~span{text-decoration:line-through;color:var(--muted)}
+.shop small{display:block;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+.card ul,.card ol{margin:4px 0;padding-left:20px}
+.card li{margin:3px 0}
+.meta{color:var(--muted);font-size:13px;margin:2px 0 0}
+.macros{font-weight:600;color:var(--accent);margin-top:8px}
+.portion{background:var(--accent-soft);border-radius:8px;padding:8px 10px;margin-top:10px}
+.note{font-size:13px;color:var(--muted)}
+.step{border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:10px 0}
+.price{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.price input{padding:6px 8px;text-align:right}
+@media print{nav,.noprint{display:none!important}main{padding:0}.card{break-inside:avoid;border-color:#999}body{background:#fff;color:#000}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<main>
+  <section id="tab-plan"></section>
+  <section id="tab-week" hidden></section>
+  <section id="tab-shop" hidden></section>
+  <section id="tab-cook" hidden></section>
+  <section id="tab-me" hidden></section>
+</main>
+<nav aria-label="Sections">
+  <button data-tab="plan" aria-current="page">Plan</button>
+  <button data-tab="week">Week</button>
+  <button data-tab="shop">Shop</button>
+  <button data-tab="cook">Cook</button>
+  <button data-tab="me">Me</button>
+</nav>
+
+<script>
+/*DATA*/
+// key: [name, unit, kcal, protein g, carbs g, fat g (per 100 g / 100 ml, or per item when unit is 'ea'),
+//       pack size, pack label, est. Aldi price AUD, aisle, pantry staple?]
+// Nutrition: USDA FoodData Central style raw/dry/drained values, matching the recipe bank's stated references.
+// Prices: estimates for Aldi Sydney, editable on the Me tab.
+const ING={
+ chicken:['Chicken breast','g',120,22.5,0,2.6,1000,'1 kg pack',11.50,'Meat & fish'],
+ beef:['Beef mince, 5% fat','g',137,21.4,0,5,500,'500 g pack',8.49,'Meat & fish'],
+ turkey:['Turkey mince','g',150,19,0,8,500,'500 g pack',8.49,'Meat & fish'],
+ pork:['Pork mince','g',164,19.2,0,9.7,500,'500 g pack',6.99,'Meat & fish'],
+ sausage:['Sausages','g',250,14,5,19.5,500,'500 g pack',5.49,'Meat & fish'],
+ salmon:['Salmon fillets','g',208,20.4,0,13.4,500,'500 g pack',17.99,'Meat & fish'],
+ tofu:['Firm tofu','g',144,17.3,2.8,8.7,450,'450 g block',3.49,'Fridge'],
+ egg:['Eggs','ea',72,6.3,0.4,4.8,12,'dozen',5.49,'Fridge'],
+ cheddar:['Grated cheddar','g',403,25,1.3,33,500,'500 g bag',6.49,'Fridge'],
+ feta:['Feta','g',264,14,4,21,200,'200 g block',3.99,'Fridge'],
+ yoghurt:['Plain non-fat Greek yoghurt','g',59,10.2,3.6,0.4,1000,'1 kg tub',5.49,'Fridge'],
+ pouch:['Yoghurt pouch','ea',130,11,18.5,0.4,1,'each',1.39,'Fridge'],
+ milk:['Milk (coffee)','ml',64,3.4,4.8,3.4,2000,'2 L',3.19,'Fridge'],
+ sweetpot:['Sweet potato','g',86,1.6,20,0.1,1000,'1 kg',3.99,'Fruit & veg'],
+ potato:['Potatoes','g',77,2,17.5,0.1,2000,'2 kg bag',4.49,'Fruit & veg'],
+ capsicum:['Capsicum','g',26,1,6,0.3,450,'3-pack (~450 g)',3.99,'Fruit & veg'],
+ onion:['Brown onions','g',40,1.1,9.3,0.1,1000,'1 kg bag',2.49,'Fruit & veg'],
+ carrot:['Carrots','g',41,0.9,9.6,0.2,1000,'1 kg bag',1.79,'Fruit & veg'],
+ zucchini:['Zucchini','g',17,1.2,3.1,0.3,500,'~500 g (2–3)',3.49,'Fruit & veg'],
+ cucumber:['Cucumber','g',15,0.7,3.6,0.1,300,'1 continental (~300 g)',1.49,'Fruit & veg'],
+ tomato:['Tomatoes','g',18,0.9,3.9,0.2,500,'500 g',3.49,'Fruit & veg'],
+ lettuce:['Lettuce / salad leaves','g',15,1.4,2.9,0.2,400,'1 iceberg or cos (~400 g)',2.49,'Fruit & veg'],
+ spinach:['Baby spinach','g',23,2.9,3.6,0.4,280,'280 g bag',3.99,'Fruit & veg'],
+ avocado:['Avocado','g',160,2,8.5,14.7,140,'1 avocado (~140 g flesh)',1.99,'Fruit & veg'],
+ apple:['Apples','ea',78,0.4,21,0.3,1,'each (~150 g)',0.75,'Fruit & veg'],
+ banana:['Bananas','ea',107,1.3,27.4,0.4,1,'each (~120 g peeled)',0.55,'Fruit & veg'],
+ bread:['Wholemeal bread','g',240,11,41,3.4,700,'700 g loaf',2.69,'Bakery'],
+ rice:['White rice (dry)','g',360,7,79,0.6,1000,'1 kg bag',2.49,'Tins & dry'],
+ pasta:['Pasta (dry)','g',371,13,75,1.5,500,'500 g bag',1.39,'Tins & dry'],
+ noodles:['Dry wheat noodles','g',371,13,75,1.5,400,'400 g pack',2.29,'Tins & dry'],
+ oats:['Rolled oats','g',389,16.9,66,6.9,1000,'1 kg bag',2.79,'Tins & dry'],
+ beansBlack:['Black or kidney beans, tinned','g',95,6.3,16.5,0.4,240,'400 g tin (~240 g drained)',1.09,'Tins & dry'],
+ beansWhite:['Cannellini beans, tinned','g',105,7,18.5,0.4,240,'400 g tin (~240 g drained)',0.99,'Tins & dry'],
+ chickpeas:['Chickpeas, tinned','g',139,7,22.5,2.5,240,'400 g tin (~240 g drained)',0.99,'Tins & dry'],
+ corn:['Corn kernels, tinned','g',80,2.6,17,1.2,270,'420 g tin (~270 g drained)',1.29,'Tins & dry'],
+ tuna:['Tuna in springwater','g',110,25,0,1,300,'425 g tin (~300 g drained)',4.49,'Tins & dry'],
+ passata:['Passata','g',30,1.4,5.5,0.2,700,'700 g bottle',1.49,'Tins & dry'],
+ coconut:['Light coconut milk','g',75,0.7,2.5,7,400,'400 ml tin',1.49,'Tins & dry'],
+ salsa:['Salsa','g',36,1.5,7,0.2,300,'300 g jar',2.49,'Tins & dry'],
+ pesto:['Basil pesto','g',418,5,6,41,190,'190 g jar',3.49,'Tins & dry'],
+ peas:['Frozen peas','g',77,5.2,13.6,0.4,1000,'1 kg bag',2.69,'Freezer'],
+ stirfry:['Frozen stir-fry vegetables','g',35,2,6,0.3,1000,'1 kg bag',3.49,'Freezer'],
+ mixveg:['Frozen mixed vegetables','g',60,3,11,0.5,1000,'1 kg bag',2.99,'Freezer'],
+ edamame:['Frozen shelled edamame','g',121,11.9,8.9,5.2,400,'400 g bag',3.99,'Freezer'],
+ oil:['Olive oil','g',884,0,0,100,750,'750 ml bottle',8.79,'Pantry',1],
+ soy:['Soy sauce','g',53,8.1,4.9,0.6,500,'500 ml bottle',2.29,'Pantry',1],
+ honey:['Honey','g',304,0.3,82,0,500,'500 g jar',4.99,'Pantry',1],
+ sweetchilli:['Sweet chilli sauce','g',220,0.4,53,0.3,290,'290 ml bottle',1.99,'Pantry',1],
+ pb:['Peanut butter','g',588,25,20,50,375,'375 g jar',2.99,'Pantry',1],
+ lemon:['Lemon or lime juice','g',22,0.4,7,0.2,250,'250 ml bottle',1.79,'Pantry',1],
+ garlic:['Crushed garlic (jar)','g',120,5,25,0.5,200,'200 g jar',2.49,'Pantry',1],
+ ginger:['Minced ginger (jar)','g',80,1.8,18,0.8,200,'200 g jar',2.79,'Pantry',1],
+ taco:['Taco / fajita / chilli seasoning','g',300,8,55,5,35,'35 g packet',0.89,'Pantry',1],
+ curry:['Curry powder','g',325,14,58,14,50,'50 g jar',1.99,'Pantry',1],
+ spice:['Paprika, cumin, dried herbs','g',290,13,55,9,40,'40 g jar',1.49,'Pantry',1],
+ powder:['Protein powder (Myprotein, 30 g scoop)','g',387,75.3,6,6.3,1000,'1 kg bag (33 scoops)',55.00,'Not from Aldi',1],
+};
+const RECIPES=[
+ {id:1,n:'Chicken burrito bowls',s:4,min:30,ing:{chicken:800,rice:240,beansBlack:240,corn:240,capsicum:300,salsa:200,cheddar:80,oil:10,taco:8},
+  m:['Cook the rice following the packet.','Heat the oil in a large frying pan. Add the diced chicken and taco seasoning and cook for 6–8 min, stirring.','Add the sliced capsicum and cook until the chicken is cooked through. Stir in the drained beans and corn until hot.','Divide rice and chicken mix into 4 containers. Top with salsa and cheese.']},
+ {id:2,n:'Chicken fajita rice',s:4,min:30,ing:{chicken:800,rice:280,capsicum:300,onion:150,passata:400,yoghurt:200,oil:10,lemon:30,taco:8},
+  m:['Cook the rice.','Heat the oil and fry the sliced chicken, onion, capsicum and fajita seasoning for 8–10 min.','Add the passata and simmer 8–10 min until the chicken is cooked.','Divide with the rice. Mix yoghurt with the citrus juice and keep it in 4 small separate pots; add after reheating.']},
+ {id:3,n:'Chicken sweet-potato nacho bowls',s:4,min:40,ing:{chicken:800,sweetpot:1200,beansBlack:240,corn:240,cheddar:80,salsa:200,oil:15,taco:8},
+  m:['Heat the oven to 220°C (200°C fan).','Cut the sweet potato into small wedges, toss with 10 g oil and half the seasoning. Spread over two trays and roast 30–35 min, turning halfway.','Cook the diced chicken in the remaining 5 g oil with the rest of the seasoning. Stir in beans and corn.','Divide into 4, top with salsa and cheese. Wedges soften in the fridge; that is normal.']},
+ {id:4,n:'Chicken pesto pasta',s:4,min:25,ing:{chicken:800,pasta:280,pesto:80,peas:300,spinach:200,lemon:30},
+  m:['Cook the pasta, adding the peas for the last 3 min. Keep a mug of pasta water.','Cook the diced chicken in a non-stick pan with a splash of water as needed (no oil counted).','Add the spinach and let it wilt.','Stir through pasta, peas, 80 g pesto (not the whole jar) and lemon juice. Loosen with pasta water.']},
+ {id:5,n:'Chicken stir-fry noodles',s:4,min:25,ing:{chicken:800,noodles:280,stirfry:800,soy:60,honey:20,sweetchilli:30,garlic:10,ginger:10,oil:15},
+  m:['Cook the noodles following the packet; drain.','Mix soy, honey, sweet chilli, garlic and ginger.','Heat the oil and stir-fry the sliced chicken in two batches.','Cook the vegetables, return the chicken and add the sauce.','Toss through the noodles and heat until the chicken is fully cooked.'],
+  note:'Uses dry wheat noodles, not instant fried or fresh pouch noodles.'},
+ {id:6,n:'Chicken tomato curry',s:4,min:35,ing:{chicken:800,rice:200,chickpeas:240,passata:400,mixveg:500,onion:150,garlic:10,oil:10,curry:12},
+  m:['Cook the rice.','Heat the oil and soften the onion 5 min. Add garlic and curry powder; stir 30 sec.','Add the chicken, passata, chickpeas, vegetables and about 150 ml water.','Simmer 15–20 min, stirring now and then, until the chicken is cooked. Divide with the rice.']},
+ {id:7,n:'Beef taco sweet-potato bowls',s:4,min:40,ing:{beef:800,sweetpot:1200,beansBlack:240,corn:240,salsa:200,yoghurt:200,cheddar:60,oil:10,taco:8},
+  m:['Heat the oven to 220°C. Toss the diced sweet potato in oil and roast 30–35 min.','Brown the mince in a non-stick pan, breaking it up well.','Add taco seasoning and a splash of water. Stir in beans and corn and heat through.','Portion with sweet potato, salsa and cheese. Keep the yoghurt separate.']},
+ {id:8,n:'Beef bolognese pasta',s:4,min:35,ing:{beef:800,pasta:280,passata:700,onion:150,carrot:200,zucchini:250,garlic:10,oil:10,spice:4},
+  m:['Heat the oil and cook the diced onion, grated carrot and grated zucchini for 5 min.','Add the mince and garlic. Cook, breaking it up, until browned throughout.','Add the passata and dried herbs; simmer 15–20 min.','Cook the pasta and divide with the sauce. Cheese is not counted.']},
+ {id:9,n:'Beef chilli with rice',s:4,min:35,ing:{beef:800,rice:240,beansBlack:240,passata:400,onion:150,capsicum:300,garlic:10,oil:10,taco:12},
+  m:['Cook the rice.','Heat the oil and soften the onion and capsicum.','Add the mince and garlic; brown thoroughly.','Add chilli seasoning, passata, beans and 100–150 ml water.','Simmer 15–20 min. Divide with the rice.']},
+ {id:10,n:'Beef, sweet-potato and egg hash',s:4,min:40,ing:{beef:800,sweetpot:1200,onion:150,capsicum:300,egg:4,oil:10,spice:8},
+  m:['Roast the diced sweet potato with the oil at 220°C for 30–35 min.','Brown the mince with onion, capsicum and smoked paprika/cumin.','Stir through the cooked sweet potato.','Hard-boil the 4 eggs, cool and peel. One egg per container.']},
+ {id:11,n:'Beef meatballs with pasta',s:4,min:40,ing:{beef:800,pasta:280,egg:1,oats:40,passata:700,onion:150,garlic:10,oil:10,spice:4},
+  m:['Heat the oven to 200°C.','Mix mince, egg, oats and half the herbs. Roll 20 small meatballs.','Bake on baking paper 20–25 min until cooked through.','Meanwhile heat the oil, soften onion and garlic, add passata and remaining herbs; simmer 15 min.','Cook the pasta and serve with meatballs and sauce.']},
+ {id:12,n:'Beef kofta bowls',s:4,min:30,ing:{beef:800,rice:240,cucumber:300,tomato:400,lettuce:200,yoghurt:200,lemon:30,oil:10,spice:8},
+  m:['Cook the rice.','Mix the mince with cumin/paprika/garlic and shape 12 small flat koftas.','Heat the oil and pan-fry, turning often, until cooked through.','Mix the yoghurt with lemon juice.','Rice and koftas go in the containers. Pack salad and dressing separately; add after reheating.']},
+ {id:13,n:'Turkey meatballs with sweet potato',s:4,min:45,ing:{turkey:800,sweetpot:1200,egg:1,oats:40,passata:700,onion:150,garlic:10,oil:10,spice:4},
+  m:['Heat the oven to 220°C. Toss the diced sweet potato with the oil and roast 30–35 min.','Mix turkey, egg, oats and half the herbs. Roll 20 small meatballs.','Bake on a separate lined tray 18–25 min; the centre must reach 74°C.','Simmer onion, garlic, passata and remaining herbs, covered, with a splash of water for 15–20 min.','Divide sweet potato, meatballs and sauce.']},
+ {id:14,n:'Pork and apple meatballs',s:4,min:45,ing:{pork:800,apple:1,egg:1,oats:40,potato:1000,mixveg:800,garlic:10,oil:10,spice:4},
+  m:['Heat the oven to 220°C. Toss the diced potatoes in the oil and roast 35–40 min.','Mix pork, 1 grated apple, egg, oats, garlic and sage/herbs. Roll 20 small meatballs.','Bake on a separate tray 20–25 min until cooked through.','Microwave or steam the vegetables and portion everything.'],
+  note:'Assumes pork mince with about 10 g fat per 100 g. Check your packet.'},
+ {id:15,n:'Sausage, bean and veg tray bake',s:4,min:45,ing:{sausage:500,beansWhite:480,potato:1000,capsicum:300,onion:150,zucchini:400,oil:10,spice:8},
+  m:['Heat the oven to 220°C.','Toss small diced potatoes, capsicum and onion wedges with oil and seasoning. Roast 15 min.','Add the sausages and thick zucchini slices. Roast another 20–25 min, turning the sausages.','Add the beans for the last 10 min. Check the sausages are cooked through.'],
+  note:'Lowest protein in the bank. Assumes sausages at 250 kcal and 14 g protein per 100 g; check the label.'},
+ {id:16,n:'Tuna sweet-potato jackets',s:4,min:20,ing:{sweetpot:1200,tuna:600,corn:240,beansBlack:240,yoghurt:200,cheddar:80,lettuce:200,spice:4},
+  m:['Pierce 4 similar-sized sweet potatoes and microwave until soft, turning halfway. Do it in batches if needed.','Mix the drained tuna, corn, beans, yoghurt and paprika.','Split the potatoes and add the filling.','Top with cheese and grill until hot and melted. Serve with lettuce.']},
+ {id:17,n:'Salmon rice bowls',s:4,min:25,ing:{salmon:800,rice:200,cucumber:300,carrot:300,soy:60,honey:20,lemon:30},
+  m:['Cook the rice. Heat the oven to 200°C.','Mix soy, honey and lemon. Brush half over the salmon.','Bake the salmon on baking paper 12–18 min, depending on thickness, until cooked through.','Divide with rice, cucumber and grated carrot. Keep the unused sauce separate (it never touched raw fish).'],
+  note:'Highest fat in the bank because of farmed salmon.'},
+ {id:18,n:'Chickpea, tofu and coconut curry',s:4,min:30,ing:{chickpeas:480,tofu:600,coconut:400,passata:400,onion:150,spinach:400,rice:160,garlic:10,oil:10,curry:12},
+  m:['Cook the rice.','Heat the oil and soften the onion. Add garlic and curry powder for 30 sec.','Add passata, coconut milk, chickpeas and cubed tofu.','Simmer gently 15 min. Stir in the spinach until hot.','Divide with the rice.']},
+ {id:19,n:'Tofu peanut noodles',s:4,min:30,ing:{tofu:800,noodles:240,stirfry:800,pb:60,soy:60,honey:20,garlic:10,ginger:10,oil:10,lemon:30},
+  m:['Cook the noodles.','Whisk peanut butter, soy, honey, garlic, ginger and citrus with enough warm water to make a sauce.','Heat the oil in a large non-stick pan. Brown the cubed tofu in batches.','Cook the vegetables, then add tofu, noodles and sauce. Toss until hot.']},
+ {id:20,n:'Chicken and egg fried rice',s:4,min:30,ing:{rice:240,egg:8,chicken:400,mixveg:800,garlic:10,soy:60,oil:15},
+  m:['Cook the rice. Use it freshly cooked and well drained; do not leave it sitting on the bench.','Heat 5 g oil, scramble the eggs until set, then take them out.','Heat the remaining oil and cook the small-diced chicken thoroughly.','Add vegetables and garlic; cook until hot.','Add rice, eggs and soy. Stir-fry until steaming hot.']},
+ {id:21,n:'Warm chicken, sweet-potato and feta salad',s:1,min:30,ing:{chicken:220,sweetpot:250,lettuce:80,cucumber:100,tomato:150,feta:30,oil:5,lemon:15,spice:2},
+  m:['Toss the diced sweet potato with 3 g oil. Roast at 220°C 25–30 min, or microwave until tender.','Season the chicken and cook it in the remaining 2 g oil until cooked through. Slice.','Fill a large bowl with leaves, cucumber and tomato.','Add warm sweet potato, chicken and crumbled feta. Dress with lemon.']},
+ {id:22,n:'Tuna, white-bean and crunchy salad',s:1,min:10,ing:{tuna:200,beansWhite:120,lettuce:80,cucumber:150,tomato:150,carrot:100,bread:60,oil:5,lemon:15},
+  m:['Rinse and drain the beans.','Chop the vegetables and combine with leaves, beans and tuna.','Dress with oil and lemon.','Serve with 60 g toasted wholemeal bread.']},
+ {id:23,n:'Chicken and avocado taco salad',s:1,min:20,ing:{chicken:200,beansBlack:100,corn:80,avocado:60,lettuce:100,tomato:150,yoghurt:50,salsa:50,oil:5,taco:2},
+  m:['Heat the oil and cook the sliced chicken with taco seasoning until cooked through.','Put chopped lettuce, tomato, beans and corn in a large bowl.','Add the chicken and 60 g avocado.','Mix yoghurt and salsa as the dressing. Tortilla chips are not counted.']},
+ {id:24,n:'Warm salmon and potato salad',s:1,min:25,ing:{salmon:180,potato:250,peas:80,lettuce:80,cucumber:100,yoghurt:60,lemon:15},
+  m:['Boil the diced potatoes until tender; add the peas for the last 3 min. Drain.','Bake the salmon on baking paper at 200°C for 12–18 min until cooked through.','Mix yoghurt and lemon with a little water.','Combine potatoes, peas, leaves and cucumber. Add the salmon and dressing.']},
+ {id:25,n:'Crispy tofu, edamame and peanut salad',s:1,min:20,ing:{tofu:220,edamame:100,stirfry:250,carrot:100,pb:15,soy:15,lemon:15,oil:5},
+  m:['Pat the tofu dry and cut into small cubes.','Heat the oil in a non-stick pan and fry the tofu until golden.','Cook the edamame and stir-fry vegetables following their packets. Cool slightly.','Mix peanut butter, soy, citrus and warm water into a dressing.','Toss vegetables, carrot, tofu, edamame and dressing.']},
+];
+const BF={
+ eggs:{n:'Eggs on toast',ing:{egg:3,bread:80},m:['Toast 2 slices wholemeal (80 g).','Scramble or poach 3 eggs in a non-stick pan. No butter.']},
+ oats:{n:'Protein oats',ing:{oats:70,powder:30,yoghurt:100},m:['Microwave 70 g oats with about 250 ml water for 2–3 min, stirring halfway.','Cool 1 min, stir in a 30 g scoop of protein powder, top with 100 g Greek yoghurt.']},
+};
+const DAILY={apple:1,banana:1,pouch:1,milk:90}; // snacks + 3 small coffees
+const SHAKE={powder:30};
+function macros(ing){const t=[0,0,0,0];for(const k in ing){const d=ING[k],f=d[1]==='ea'?ing[k]:ing[k]/100;for(let i=0;i<4;i++)t[i]+=d[2+i]*f}return t}
+/*END*/
+
+const RB=Object.fromEntries(RECIPES.map(r=>[r.id,r]));
+const MEAT=['chicken','beef','turkey','pork','sausage','salmon'];
+const DAYS=['Tue','Wed','Thu','Fri','Sat','Sun','Mon'];
+// [lunch, dinner] source per day. 'last' = the frozen portion from last week's Sunday cook; '*' = eaten from the freezer.
+const SLOTS=[['last','tue'],['tue','salad'],['tue','thu'],['thu','thu'],['thu','tue*'],['sun',null],['sun','sun']];
+const AISLES=['Meat & fish','Fruit & veg','Fridge','Freezer','Bakery','Tins & dry','Pantry','Not from Aldi'];
+const ACT=[[1.2,'Desk job, little exercise'],[1.375,'Light: about 10,000 steps a day, or 1–3 workouts a week'],[1.55,'Moderate: active job or 3–5 workouts a week'],[1.725,'Very active: physical job and regular training']];
+
+let S={plan:{bf:'eggs',tue:2,thu:8,sun:1,salad:22,shake:true,last:1},
+       me:{sex:'m',age:40,h:178,w:85,goal:78,act:1.375,budget:110,set:false},prices:{},ticks:{}};
+try{const s=JSON.parse(localStorage.getItem('prep-planner')||'null');if(s){Object.assign(S.plan,s.plan);Object.assign(S.me,s.me);S.prices=s.prices||{};S.ticks=s.ticks||{}}}catch(e){}
+const save=()=>{try{localStorage.setItem('prep-planner',JSON.stringify(S))}catch(e){}};
+
+const $=s=>document.querySelector(s);
+const money=x=>'$'+x.toFixed(2);
+const price=k=>{const v=S.prices[k];return v===undefined||v===''||isNaN(+v)?ING[k][8]:+v};
+const pp=r=>macros(r.ing).map(x=>x/r.s);
+const cost=ing=>Object.keys(ing).reduce((a,k)=>a+ing[k]/ING[k][6]*price(k),0);
+const cpp=r=>cost(r.ing)/r.s;
+const sum=(a,b)=>a.map((x,i)=>x+b[i]);
+const kj=k=>Math.round(k*4.184/10)*10;
+function amt(k,q){const u=ING[k][1];if(u==='ea')return q+' ×';if(u==='ml')return q>=1000?(q/1000)+' L':q+' ml';return q>=1000?(Math.round(q/10)/100)+' kg':Math.round(q)+' g'}
+const line=m=>`${Math.round(m[0])} kcal · ${Math.round(m[1])} g protein · ${Math.round(m[2])} g carbs · ${Math.round(m[3])} g fat`;
+const src=key=>RB[S.plan[key.replace('*','')]];
+
+function targets(){
+  const m=S.me,bmr=10*m.w+6.25*m.h-5*m.age+(m.sex==='m'?5:-161),tdee=bmr*m.act;
+  const floor=m.sex==='m'?1500:1200,kcal=Math.max(floor,Math.round((tdee-500)/10)*10),deficit=tdee-kcal;
+  return {bmr,tdee,kcal,protein:Math.round(1.6*m.w),deficit,weeks:deficit>0?(m.w-m.goal)*7700/(deficit*7):Infinity};
+}
+function base(){let t=macros(BF[S.plan.bf].ing);t=sum(t,macros(DAILY));if(S.plan.shake)t=sum(t,macros(SHAKE));return t}
+function days(){
+  const b=base();
+  return DAYS.map((d,i)=>{const [l,dn]=SLOTS[i],L=src(l),D=dn&&src(dn);let t=sum(b,pp(L));if(D)t=sum(t,pp(D));return {d,L,D,l,dn,t}});
+}
+function shopping(){
+  const p=S.plan,q={},add=(ing,x)=>{for(const k in ing)q[k]=(q[k]||0)+ing[k]*x};
+  [p.tue,p.thu,p.sun,p.salad].forEach(id=>add(RB[id].ing,1));
+  add(BF[p.bf].ing,7);add(DAILY,7);if(p.shake)add(SHAKE,7);
+  let spend=0,used=0;const rows={};
+  for(const k in q){const d=ING[k],packs=Math.ceil(q[k]/d[6]-1e-9),aisle=d[10]?'Pantry':d[9];
+    used+=q[k]/d[6]*price(k);if(!d[10])spend+=packs*price(k);
+    (rows[aisle]=rows[aisle]||[]).push({k,q:q[k],packs});}
+  return {rows,spend,used};
+}
+
+/* ---------- Plan ---------- */
+function opts(list){return list.map(r=>{const m=pp(r);return [r.id,`${r.n} · ${Math.round(m[0])} kcal · ${Math.round(m[1])} g P · ${money(cpp(r))}${m[1]<40?' · lower protein':''}`]})}
+function sel(id,label,options,val,help){
+  return `<label class="field" for="${id}"><span>${label}</span><select id="${id}" data-plan="${id}">${options.map(([v,t])=>`<option value="${v}"${v==val?' selected':''}>${t}</option>`).join('')}</select><span class="hint">${help}</span></label>`;
+}
+function renderPlan(){
+  const p=S.plan,t=targets(),ds=days(),full=ds.filter(x=>x.D),avg=full.reduce((a,x)=>sum(a,x.t),[0,0,0,0]).map(x=>x/full.length),sun=ds[5].t,sh=shopping();
+  const kc=avg[0]-t.kcal,kcls=Math.abs(kc)<=150?'ok':kc>0?'bad':'warn';
+  const pcls=avg[1]>=t.protein?'ok':'warn',bcls=sh.used<=S.me.budget?'ok':'bad';
+  const batch=RECIPES.filter(r=>r.s===4),salads=RECIPES.filter(r=>r.s===1);
+  $('#tab-plan').innerHTML=`
+  <h1>This week's prep</h1>
+  <p class="sub">Week runs Tuesday to Monday. Shop Tuesday after work.</p>
+  ${S.me.set?'':'<p class="step warn"><b>Targets below use example stats.</b> Enter your age, height and weight on the Me tab and this phone will remember them.</p>'}
+  <div class="stats">
+    <div class="stat"><b class="${kcls}">${Math.round(avg[0])}</b><span>kcal a day (target ${t.kcal})</span></div>
+    <div class="stat"><b class="${pcls}">${Math.round(avg[1])} g</b><span>protein a day (aim ${t.protein} g+)</span></div>
+    <div class="stat"><b class="${bcls}">${money(sh.used)}</b><span>food cost a week (budget ${money(+S.me.budget)})</span></div>
+    <div class="stat"><b>${money(sh.spend)}</b><span>Tuesday shop in whole packs</span></div>
+  </div>
+  <p class="hint">Food cost counts only what you eat, all meals and snacks included. The till total is higher in weeks you restock rice, cheese, yoghurt or onions, then lower while they last. Daily average covers the six days with a planned dinner. Sunday is ${Math.round(sun[0])} kcal before dinner, which leaves about ${Math.max(0,Math.round(t.kcal-sun[0]))} kcal for a dinner of your choice.</p>
+  ${sel('bf','Breakfast this week',[['eggs',`Eggs on toast · ${Math.round(macros(BF.eggs.ing)[0])} kcal · ${Math.round(macros(BF.eggs.ing)[1])} g P`],['oats',`Protein oats · ${Math.round(macros(BF.oats.ing)[0])} kcal · ${Math.round(macros(BF.oats.ing)[1])} g P`]],p.bf,'Every day, Tuesday to Monday.')}
+  ${sel('tue','Tuesday cook (dinner time)',opts(batch),p.tue,'Tue dinner, Wed lunch, Thu lunch, plus one frozen for Sat dinner.')}
+  ${sel('salad','Wednesday dinner (fresh salad)',opts(salads),p.salad,'Made fresh on Wednesday night, one large bowl.')}
+  ${sel('thu','Thursday cook (dinner time)',opts(batch),p.thu,'Thu dinner, Fri lunch and dinner, Sat lunch.')}
+  ${sel('sun','Sunday cook (lunch time)',opts(batch),p.sun,'Sun lunch, Mon lunch and dinner, plus one frozen for next Tuesday\'s lunch.')}
+  <label class="switch" for="shake"><input type="checkbox" id="shake" ${p.shake?'checked':''}> Protein shake every day (30 g in water, ${Math.round(macros(SHAKE)[0])} kcal, ${Math.round(macros(SHAKE)[1])} g protein)</label>
+  ${sel('last','Tuesday lunch: frozen from last Sunday',opts(batch),p.last,'Set automatically when you start next week.')}
+  <h2>Next week</h2>
+  <p class="hint">When this week is done, tap below. This Sunday's meal becomes next Tuesday's lunch and the shopping ticks clear. Your choices stay as they are until you change them.</p>
+  <p class="row noprint"><button class="btn" id="nextweek">Start next week</button></p>`;
+}
+
+/* ---------- Week ---------- */
+function renderWeek(){
+  const t=targets(),bf=BF[S.plan.bf].n;
+  const rows=days().map(x=>{const c=x.D?(Math.abs(x.t[0]-t.kcal)<=150?'ok':x.t[0]>t.kcal?'bad':'warn'):'';
+    return `<tr><th>${x.d}</th><td>${x.l==='last'?'<small class="hint">Frozen · </small>':''}${x.L.n}</td><td>${x.dn&&x.dn.endsWith('*')?'<small class="hint">Frozen · </small>':''}${x.D?x.D.n:'<span class="hint">Your choice (not planned)</span>'}</td><td class="r ${c}">${Math.round(x.t[0])}</td><td class="r">${Math.round(x.t[1])}</td></tr>`}).join('');
+  $('#tab-week').innerHTML=`<h1>Week at a glance</h1>
+  <p class="sub">Every day also has ${bf.toLowerCase()}, an apple, a banana, a yoghurt pouch and 3 small coffees${S.plan.shake?', plus the shake':''}. Target ${t.kcal} kcal and ${t.protein} g protein.</p>
+  <div class="tablewrap"><table><thead><tr><th>Day</th><th>Lunch</th><th>Dinner</th><th class="r">kcal</th><th class="r">Protein g</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="hint">Green is within 150 kcal of target. Red is over, amber is under.</p>
+  <h2>Per portion</h2>
+  <div class="tablewrap"><table><thead><tr><th>Meal</th><th class="r">kcal</th><th class="r">P</th><th class="r">C</th><th class="r">F</th><th class="r">Cost</th></tr></thead><tbody>
+  ${[['Breakfast',{n:bf,ing:BF[S.plan.bf].ing,s:1}],['Snacks + coffees',{n:'Apple, banana, pouch, milk',ing:DAILY,s:1}],...(S.plan.shake?[['Shake',{n:'30 g in water',ing:SHAKE,s:1}]]:[]),['Tue cook',src('tue')],['Thu cook',src('thu')],['Wed salad',src('salad')],['Sun cook',src('sun')]]
+    .map(([l,r])=>{const m=pp(r);return `<tr><td><small class="hint">${l}</small><br>${r.n}</td>${m.map(v=>`<td class="r">${Math.round(v)}</td>`).join('')}<td class="r">${money(cpp(r))}</td></tr>`}).join('')}
+  </tbody></table></div>`;
+}
+
+/* ---------- Shop ---------- */
+function renderShop(){
+  const sh=shopping();
+  const block=a=>{const items=sh.rows[a];if(!items)return '';
+    items.sort((x,y)=>ING[x.k][0].localeCompare(ING[y.k][0]));
+    return `<h2>${a==='Pantry'?'Check the pantry':a}</h2><ul class="shop">${items.map(({k,q,packs})=>{const d=ING[k],left=packs*d[6]-q;
+      const buy=a==='Pantry'?`Need ${amt(k,q)}${d[1]==='ea'?'':' this week'}. Buy a ${d[7]} if low.`:(d[1]==='ea'&&d[6]===1?`Buy ${packs}`:`Buy ${packs} × ${d[7]}`)+(left>0&&d[6]>1?` · ${amt(k,left)} spare`:'');
+      return `<li><label for="t-${k}"><input type="checkbox" id="t-${k}" data-tick="${k}" ${S.ticks[k]?'checked':''}><span>${d[0]} <b>${d[1]==='ea'?q:amt(k,q)}</b><small>${buy}</small></span><span class="num">${a==='Pantry'?'':money(packs*price(k))}</span></label></li>`}).join('')}</ul>`};
+  $('#tab-shop').innerHTML=`<h1>Tuesday shop</h1>
+  <p class="sub">Everything for Tue–Mon. Till total in whole packs ≈ <b>${money(sh.spend)}</b>. Food eaten this week ≈ ${money(sh.used)} (budget ${money(+S.me.budget)}). Skip anything already in the cupboard from last week.</p>
+  <p class="row noprint"><button class="btn ghost" id="clearticks">Clear ticks</button> <button class="btn ghost printbtn" onclick="print()">Print</button></p>
+  ${AISLES.map(block).join('')}
+  <p class="hint">Prices are Aldi Sydney estimates. Fix any that are wrong on the Me tab and every total updates. Tins are listed by drained weight.</p>`;
+}
+
+/* ---------- Cook ---------- */
+function ingList(r){return `<ul>${Object.entries(r.ing).map(([k,q])=>`<li>${ING[k][1]==='ea'?q+' × '+ING[k][0].toLowerCase():amt(k,q)+' '+ING[k][0].toLowerCase()}</li>`).join('')}</ul>`}
+function card(r,when,portion){const m=pp(r);return `<article class="card"><h3>${r.n}</h3><p class="meta">${when} · about ${r.min} min · makes ${r.s}</p>
+  <p class="macros">${line(m)} per portion</p><h4>Ingredients</h4>${ingList(r)}<h4>Method</h4><ol>${r.m.map(s=>`<li>${s}</li>`).join('')}</ol>${r.note?`<p class="note">${r.note}</p>`:''}<p class="portion">${portion}</p></article>`}
+const raw=r=>MEAT.filter(k=>r.ing[k]).map(k=>`${amt(k,r.ing[k])} ${ING[k][0].toLowerCase()}`).join(' and ');
+function renderCook(){
+  const tue=src('tue'),thu=src('thu'),sun=src('sun'),sal=src('salad'),b=BF[S.plan.bf];
+  $('#tab-cook').innerHTML=`<h1>Cook days</h1>
+  <p class="sub">Follow top to bottom through the week.</p>
+  <p class="row noprint"><button class="btn ghost printbtn" onclick="print()">Print</button></p>
+  <h2>Tuesday, after the shop</h2>
+  ${raw(sun)?`<p class="step"><b>Freeze now:</b> ${raw(sun)} for Sunday. Label the bag.</p>`:''}
+  ${raw(sal)?`<p class="step"><b>Fridge:</b> ${raw(sal)} for Wednesday's salad.</p>`:''}
+  ${raw(thu)?`<p class="step"><b>Fridge:</b> ${raw(thu)} for Thursday. If its use-by date is before Thursday, freeze it and move it to the fridge Wednesday night.</p>`:''}
+  ${card(tue,'Tuesday dinner time','Eat 1 tonight. Fridge 2: Wed lunch, Thu lunch. Freeze 1, labelled "Sat dinner". Add cold toppings like salsa, yoghurt or salad on the day, not before freezing.')}
+  <h2>Wednesday, dinner time</h2>
+  ${card(sal,'Wednesday dinner','Eat fresh. Nothing to store.')}
+  <h2>Thursday, dinner time</h2>
+  ${card(thu,'Thursday dinner time','Eat 1 tonight. Fridge 3: Fri lunch, Fri dinner, Sat lunch.')}
+  <h2>Friday night</h2>
+  <p class="step">Move the frozen "Sat dinner" portion to the fridge.</p>
+  ${raw(sun)?`<h2>Saturday morning</h2><p class="step">Move the ${raw(sun)} from the freezer to the fridge for Sunday.</p>`:''}
+  <h2>Sunday, lunch time</h2>
+  ${card(sun,'Sunday lunch time','Eat 1 now. Fridge 2: Mon lunch, Mon dinner. Freeze 1, labelled "Tue lunch".')}
+  <h2>Monday night</h2>
+  <p class="step">Move the frozen "Tue lunch" portion to the fridge.</p>
+  <h2>Every morning</h2>
+  <article class="card"><h3>${b.n}</h3><p class="macros">${line(macros(b.ing))}</p><ol>${b.m.map(s=>`<li>${s}</li>`).join('')}</ol></article>
+  <h2>Food safety</h2>
+  <ul class="hint">
+   <li>Cool cooked food in shallow containers and get it in the fridge or freezer within 1 hour. Keep the fridge below 5°C.</li>
+   <li>This plan eats every rice or pasta portion within 2 days of cooking. Freeze anything that will run over.</li>
+   <li>Chicken and turkey: at least 74°C in the centre. Cook mince and sausages right through.</li>
+   <li>Thaw in the fridge, never on the bench. Reheat until steaming hot, once only.</li>
+   <li>Keep salad leaves and cold dressings out of the containers you reheat.</li>
+  </ul>`;
+}
+
+/* ---------- Me ---------- */
+function renderMe(){
+  const m=S.me,t=targets();
+  const num=(id,label,v,step)=>`<label class="field" for="${id}"><span>${label}</span><input type="number" inputmode="decimal" id="${id}" data-me="${id}" value="${v}" step="${step||1}"></label>`;
+  $('#tab-me').innerHTML=`<h1>Me and my targets</h1>
+  <div id="targets"></div>
+  <label class="field" for="sex"><span>Sex (for the energy formula)</span><select id="sex" data-me="sex"><option value="m"${m.sex==='m'?' selected':''}>Male</option><option value="f"${m.sex==='f'?' selected':''}>Female</option></select></label>
+  ${num('age','Age',m.age)}${num('h','Height (cm)',m.h)}${num('w','Weight now (kg)',m.w,0.1)}${num('goal','Goal weight (kg)',m.goal,0.1)}
+  <label class="field" for="act"><span>Activity</span><select id="act" data-me="act">${ACT.map(([v,l])=>`<option value="${v}"${v==m.act?' selected':''}>${l}</option>`).join('')}</select></label>
+  ${num('budget','Weekly shop budget ($)',m.budget)}
+  <h2>Aldi prices</h2>
+  <p class="hint">Price per pack. Change any that differ at your Aldi.</p>
+  ${Object.keys(ING).map(k=>`<label class="price" for="p-${k}"><span>${ING[k][0]}<br><small class="hint">${ING[k][7]}</small></span><input type="number" inputmode="decimal" step="0.01" id="p-${k}" data-price="${k}" value="${price(k).toFixed(2)}"></label>`).join('')}
+  <p class="row noprint" style="margin-top:12px"><button class="btn ghost" id="resetprices">Reset prices</button></p>
+  <h2>How the numbers are worked out</h2>
+  <p class="hint">Each meal's macros are added up from its ingredients by weight: meat, fish and veg raw; rice, pasta, noodles and oats dry; tins drained. Nutrition comes from USDA-style reference values per 100 g, so they are estimates. Your packet labels win, especially for sausages, tofu, yoghurt pouches and coconut milk. Oil, sauces, cheese and dressings are counted; anything extra you add is not.</p>`;
+  renderTargets();
+}
+function renderTargets(){
+  const t=targets(),m=S.me,el=$('#targets');if(!el)return;
+  el.innerHTML=`<div class="stats">
+   <div class="stat"><b>${t.kcal}</b><span>kcal a day target (${kj(t.kcal)} kJ)</span></div>
+   <div class="stat"><b>${t.protein} g+</b><span>protein a day (1.6 g per kg)</span></div>
+   <div class="stat"><b>${Math.round(t.tdee)}</b><span>kcal you burn a day, estimated</span></div>
+   <div class="stat"><b>${isFinite(t.weeks)?Math.round(t.weeks):'–'}</b><span>weeks to ${m.goal} kg at about ${(t.deficit*7/7700).toFixed(2)} kg a week</span></div></div>
+   <p class="hint">Mifflin-St Jeor estimate minus 500 kcal a day, which is a steady, sustainable rate. Weigh yourself at the same time each morning and go by the weekly average. If it stalls for 3 weeks, drop the activity setting one level. Recheck these numbers every 5 kg.</p>`;
+}
+
+/* ---------- wiring ---------- */
+function renderAll(){renderPlan();renderWeek();renderShop();renderCook();renderTargets()}
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.dataset.plan){S.plan[el.dataset.plan]=el.dataset.plan==='bf'?el.value:+el.value;save();renderAll()}
+  else if(el.id==='shake'){S.plan.shake=el.checked;save();renderAll()}
+  else if(el.dataset.tick){S.ticks[el.dataset.tick]=el.checked;save()}
+  else if(el.dataset.price){S.prices[el.dataset.price]=el.value;save();renderAll()}
+  else if(el.dataset.me){const k=el.dataset.me;S.me[k]=k==='sex'?el.value:+el.value;S.me.set=true;save();renderAll()}
+});
+document.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.dataset.tab){document.querySelectorAll('nav button').forEach(b=>b===t?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+    document.querySelectorAll('main>section').forEach(s=>s.hidden=s.id!=='tab-'+t.dataset.tab);window.scrollTo(0,0);try{localStorage.setItem('prep-tab',t.dataset.tab)}catch(err){}}
+  else if(t.id==='nextweek'){S.plan.last=S.plan.sun;S.ticks={};save();renderAll();t.textContent='Done. Next week started';}
+  else if(t.id==='clearticks'){S.ticks={};save();renderShop()}
+  else if(t.id==='resetprices'){S.prices={};save();renderMe();renderAll()}
+});
+renderMe();renderAll();
+// print() is blocked inside an embedded viewer, so only show Print when running as its own page
+if(window.top!==window.self)document.head.insertAdjacentHTML('beforeend','<style>.printbtn{display:none}</style>');
+try{const tab=localStorage.getItem('prep-tab');if(tab)document.querySelector(`nav button[data-tab="${tab}"]`)?.click()}catch(e){}
+try{if('serviceWorker' in navigator&&window.top===window.self)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+</script>
+
+</body></html>
