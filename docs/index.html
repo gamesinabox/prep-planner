@@ -70,7 +70,22 @@ td.r,th.r{text-align:right;white-space:nowrap}
 .portion{background:var(--accent-soft);border-radius:8px;padding:8px 10px;margin-top:10px}
 .note{font-size:13px;color:var(--muted)}
 .step{border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:10px 0}
-.pick{display:flex;gap:10px;align-items:center;margin-top:6px}
+.chooser{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);font:inherit;cursor:pointer}
+.chooser b,.opt b{display:block;font-size:15px;font-weight:600}
+.chooser small,.opt small{display:block;color:var(--muted);font-size:13px;margin-top:2px;font-variant-numeric:tabular-nums}
+.chev{font-size:26px;line-height:1;color:var(--muted);padding-right:4px}
+.field .hint{margin:2px 0 0}
+#picker{padding:0;border:0;width:100%;max-width:720px;height:100%;max-height:100%;margin:0 auto;background:var(--bg);color:var(--fg)}
+#picker::backdrop{background:rgba(0,0,0,.45)}
+#picker header{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg);border-bottom:1px solid var(--line);
+  padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+#picker header h2{margin:0;font-size:17px}
+#picker .opts{padding:0 max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.opt{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;cursor:pointer}
+.opt .thumb{width:96px;height:96px}
+.opt.on b{color:var(--accent)}
+.tick{color:var(--accent);font-size:20px;font-weight:700}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .thumb{width:64px;height:64px;object-fit:cover;border-radius:8px;flex:none;background:var(--line)}
 .hero{margin:-14px -14px 12px}
 .hero img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px 12px 0 0;background:var(--line)}
@@ -101,6 +116,7 @@ td.r,th.r{text-align:right;white-space:nowrap}
   <section id="tab-weight" hidden></section>
   <section id="tab-me" hidden></section>
 </main>
+<dialog id="picker" aria-label="Choose a meal"></dialog>
 <nav aria-label="Sections">
   <button data-tab="plan" aria-current="page">Plan</button>
   <button data-tab="week">Week</button>
@@ -469,20 +485,29 @@ function nextWeek(){
 
 /* ---------- Plan ---------- */
 const pic=id=>IMG[id]?`<img class="thumb" src="${IMG[id]}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:'';
-const optTxt=r=>{const m=pp(r);return `${r.n} · ${Math.round(m[0])} kcal · ${Math.round(m[1])} g P · ${money(cpp(r))}${m[1]<40?' · lower protein':''}`};
-// Meals picked in past weeks go first, most-picked at the top
-function opts(list,val){
-  const o=r=>`<option value="${r.id}"${r.id==val?' selected':''}>${optTxt(r)}</option>`,fav=list.filter(r=>S.picks[r.id]).sort((a,b)=>S.picks[b.id]-S.picks[a.id]);
-  return fav.length?`<optgroup label="Your usual">${fav.map(o).join('')}</optgroup><optgroup label="All meals">${list.filter(r=>!S.picks[r.id]).map(o).join('')}</optgroup>`:list.map(o).join('');
-}
-function sel(id,label,html,help,imgId){
-  return `<label class="field" for="${id}"><span>${label}</span><select id="${id}" data-plan="${id}">${html}</select></label><div class="pick">${pic(imgId)}<span class="hint">${help}</span></div>`;
+const meal=id=>RB[id]||Object.assign({s:1,id},BF[id]);
+const metaTxt=r=>{const m=pp(r);return `${Math.round(m[0])} kcal · ${Math.round(m[1])} g protein · ${money(cpp(r))}${m[1]<40?' · lower protein':''}`};
+const ids=k=>k==='bf'?Object.keys(BF):RECIPES.filter(r=>k==='salad'?r.s===1:r.s===4).map(r=>r.id);
+const UI={bf:['Breakfast this week','Every day, Tuesday to Monday.'],
+  tue:['Tuesday cook (dinner time)','Tue dinner, Wed lunch, Thu lunch, plus one frozen for Sat dinner.'],
+  salad:['Wednesday dinner (fresh salad)','Made fresh on Wednesday night, one large bowl.'],
+  thu:['Thursday cook (dinner time)','Thu dinner, Fri lunch and dinner, Sat lunch.'],
+  sun:['Sunday cook (lunch time)','Sun lunch, Mon lunch and dinner, plus one frozen for next Tuesday\'s lunch.'],
+  last:['Tuesday lunch: frozen from last Sunday','Set automatically when you start next week.']};
+function chooser(k){const r=meal(S.plan[k]);
+  return `<div class="field"><span>${UI[k][0]}</span><button class="chooser" data-choose="${k}">${pic(r.id)}<span><b>${r.n}</b><small>${metaTxt(r)}</small></span><span class="chev" aria-hidden="true">›</span></button><p class="hint">${UI[k][1]}</p></div>`}
+// Photo list of every meal for a slot; meals picked in past weeks go first, most-picked at the top
+function openPicker(k){
+  const cur=S.plan[k],all=ids(k),fav=k==='bf'?[]:all.filter(i=>S.picks[i]).sort((a,b)=>S.picks[b]-S.picks[a]);
+  const row=i=>{const r=meal(i),on=i==cur;return `<button class="opt${on?' on':''}" data-pick="${i}">${pic(i)}<span><b>${r.n}</b><small>${metaTxt(r)}</small></span>${on?'<span class="tick">✓<span class="sr"> chosen</span></span>':''}</button>`};
+  const d=$('#picker');d.dataset.slot=k;
+  d.innerHTML=`<header><h2>${UI[k][0]}</h2><button class="btn ghost" data-close>Close</button></header><div class="opts">${fav.length?`<h4>Your usual</h4>${fav.map(row).join('')}<h4>All meals</h4>`:''}${all.filter(i=>!fav.includes(i)).map(row).join('')}</div>`;
+  d.showModal();d.querySelector('.opt.on')?.scrollIntoView({block:'center'});
 }
 function renderPlan(){
   const p=S.plan,t=targets(),ds=days(),avg=ds.reduce((a,x)=>sum(a,x.t),[0,0,0,0]).map(x=>x/7),sh=shopping();
   const kc=avg[0]-t.kcal,kcls=Math.abs(kc)<=150?'ok':kc>0?'bad':'warn';
   const pcls=avg[1]>=t.protein?'ok':'warn',bcls=sh.used<=S.me.budget?'ok':'bad';
-  const batch=RECIPES.filter(r=>r.s===4),salads=RECIPES.filter(r=>r.s===1);
   $('#tab-plan').innerHTML=`
   <h1>This week's prep</h1>
   <p class="sub">Week runs Tuesday to Monday. Shop Tuesday after work.</p>
@@ -494,13 +519,9 @@ function renderPlan(){
     <div class="stat"><b>${money(sh.spend)}</b><span>Tuesday shop in whole packs</span></div>
   </div>
   <p class="hint">Daily figures are the average over all 7 days, Sunday with no dinner. Food cost counts only what you eat, all meals and snacks included. The till total is higher in weeks you restock rice, cheese or onions, then lower while they last.</p>
-  ${sel('bf','Breakfast this week',Object.entries(BF).map(([k,b])=>`<option value="${k}"${k===p.bf?' selected':''}>${b.n} · ${Math.round(macros(b.ing)[0])} kcal · ${Math.round(macros(b.ing)[1])} g P</option>`).join(''),'Every day, Tuesday to Monday.',p.bf)}
-  ${sel('tue','Tuesday cook (dinner time)',opts(batch,p.tue),'Tue dinner, Wed lunch, Thu lunch, plus one frozen for Sat dinner.',p.tue)}
-  ${sel('salad','Wednesday dinner (fresh salad)',opts(salads,p.salad),'Made fresh on Wednesday night, one large bowl.',p.salad)}
-  ${sel('thu','Thursday cook (dinner time)',opts(batch,p.thu),'Thu dinner, Fri lunch and dinner, Sat lunch.',p.thu)}
-  ${sel('sun','Sunday cook (lunch time)',opts(batch,p.sun),'Sun lunch, Mon lunch and dinner, plus one frozen for next Tuesday\'s lunch.',p.sun)}
+  ${chooser('bf')}${chooser('tue')}${chooser('salad')}${chooser('thu')}${chooser('sun')}
   <label class="switch" for="shake"><input type="checkbox" id="shake" ${p.shake?'checked':''}> Protein shake every day (30 g in water, ${Math.round(macros(SHAKE)[0])} kcal, ${Math.round(macros(SHAKE)[1])} g protein)</label>
-  ${sel('last','Tuesday lunch: frozen from last Sunday',opts(batch,p.last),'Set automatically when you start next week.',p.last)}
+  ${chooser('last')}
   <h2>Next week</h2>
   <p class="hint">When this week is done, tap below. This Sunday's meal becomes next Tuesday's lunch, the meals you ate move up your "Your usual" list, spare rice, cheese, tins and frozen goods are taken off next week's shop, and the ticks clear.</p>
   <p class="row noprint"><button class="btn" id="nextweek">Start next week</button></p>`;
@@ -663,8 +684,7 @@ function renderTargets(){
 function renderAll(){renderPlan();renderWeek();renderShop();renderCook();renderWeight();renderTargets()}
 document.addEventListener('change',e=>{
   const el=e.target;
-  if(el.dataset.plan){S.plan[el.dataset.plan]=el.dataset.plan==='bf'?el.value:+el.value;save();renderAll()}
-  else if(el.id==='shake'){S.plan.shake=el.checked;save();renderAll()}
+  if(el.id==='shake'){S.plan.shake=el.checked;save();renderAll()}
   else if(el.dataset.tick){S.ticks[el.dataset.tick]=el.checked;save()}
   else if(el.dataset.price){S.prices[el.dataset.price]=el.value;save();renderAll()}
   else if(el.dataset.me){const k=el.dataset.me;S.me[k]=k==='sex'?el.value:+el.value;S.me.set=true;
@@ -672,7 +692,10 @@ document.addEventListener('change',e=>{
     save();renderAll()}
 });
 document.addEventListener('click',e=>{
-  const t=e.target;
+  const t=e.target,c=t.closest('[data-choose],[data-pick],[data-close]'),d=$('#picker');
+  if(t===d||(c&&'close' in c.dataset)){d.close();return}  // tap outside the list or Close
+  if(c&&c.dataset.choose){openPicker(c.dataset.choose);return}
+  if(c&&c.dataset.pick){const k=d.dataset.slot;S.plan[k]=k==='bf'?c.dataset.pick:+c.dataset.pick;save();d.close();renderAll();return}
   if(t.dataset.tab){document.querySelectorAll('nav button').forEach(b=>b===t?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
     document.querySelectorAll('main>section').forEach(s=>s.hidden=s.id!=='tab-'+t.dataset.tab);window.scrollTo(0,0);try{localStorage.setItem('prep-tab',t.dataset.tab)}catch(err){}}
   else if(t.id==='nextweek'){nextWeek();save();renderAll();$('#nextweek').textContent='Done. Next week started'}
