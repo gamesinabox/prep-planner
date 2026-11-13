@@ -33,7 +33,7 @@ h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute
 p{margin:6px 0}
 .sub{color:var(--muted);font-size:13px;margin:0 0 10px}
 .num,table,.macros{font-variant-numeric:tabular-nums}
-nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
 nav button{appearance:none;border:0;background:none;color:var(--muted);font:600 13px var(--font);padding:12px 0 14px;cursor:pointer}
 nav button[aria-current="page"]{color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
 nav button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -70,6 +70,23 @@ td.r,th.r{text-align:right;white-space:nowrap}
 .portion{background:var(--accent-soft);border-radius:8px;padding:8px 10px;margin-top:10px}
 .note{font-size:13px;color:var(--muted)}
 .step{border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:10px 0}
+.pick{display:flex;gap:10px;align-items:center;margin-top:6px}
+.thumb{width:64px;height:64px;object-fit:cover;border-radius:8px;flex:none;background:var(--line)}
+.hero{margin:-14px -14px 12px}
+.hero img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px 12px 0 0;background:var(--line)}
+.hero figcaption{font-size:11px;color:var(--muted);padding:4px 14px 0}
+.wform{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+.wform .field{margin:0}
+.chart{width:100%;height:auto;display:block;margin-top:12px}
+.chart text{font:11px var(--font);fill:var(--muted)}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .goal{stroke:var(--ok);stroke-width:1.5;stroke-dasharray:5 4}
+.chart .goaltxt{fill:var(--ok)}
+.chart .dot{fill:var(--muted);opacity:.6}
+.chart .avg{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round}
+.entries{list-style:none;padding:0;margin:0}
+.entries li{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.entries .btn{padding:6px 10px;font-size:13px}
 .price{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
 .price input{padding:6px 8px;text-align:right}
 @media print{nav,.noprint{display:none!important}main{padding:0}.card{break-inside:avoid;border-color:#999}body{background:#fff;color:#000}}
@@ -81,6 +98,7 @@ td.r,th.r{text-align:right;white-space:nowrap}
   <section id="tab-week" hidden></section>
   <section id="tab-shop" hidden></section>
   <section id="tab-cook" hidden></section>
+  <section id="tab-weight" hidden></section>
   <section id="tab-me" hidden></section>
 </main>
 <nav aria-label="Sections">
@@ -88,6 +106,7 @@ td.r,th.r{text-align:right;white-space:nowrap}
   <button data-tab="week">Week</button>
   <button data-tab="shop">Shop</button>
   <button data-tab="cook">Cook</button>
+  <button data-tab="weight">Weight</button>
   <button data-tab="me">Me</button>
 </nav>
 
@@ -101,7 +120,6 @@ const ING={
  chicken:['Chicken breast','g',120,22.5,0,2.6,1000,'1 kg pack',11.50,'Meat & fish'],
  beef:['Beef mince, 5% fat','g',137,21.4,0,5,500,'500 g pack',8.49,'Meat & fish'],
  turkey:['Turkey mince','g',150,19,0,8,500,'500 g pack',8.49,'Meat & fish'],
- pork:['Pork mince','g',164,19.2,0,9.7,500,'500 g pack',6.99,'Meat & fish'],
  sausage:['Sausages','g',250,14,5,19.5,500,'500 g pack',5.49,'Meat & fish'],
  salmon:['Salmon fillets','g',208,20.4,0,13.4,500,'500 g pack',17.99,'Meat & fish'],
  tofu:['Firm tofu','g',144,17.3,2.8,8.7,450,'450 g block',3.49,'Fridge'],
@@ -110,7 +128,7 @@ const ING={
  feta:['Feta','g',264,14,4,21,200,'200 g block',3.99,'Fridge'],
  yoghurt:['Plain non-fat Greek yoghurt','g',59,10.2,3.6,0.4,1000,'1 kg tub',5.49,'Fridge'],
  pouch:['Yoghurt pouch','ea',130,11,18.5,0.4,1,'each',1.39,'Fridge'],
- milk:['Milk (coffee)','ml',64,3.4,4.8,3.4,2000,'2 L',3.19,'Fridge'],
+ milk:['Milk','ml',64,3.4,4.8,3.4,2000,'2 L',3.19,'Fridge'],
  sweetpot:['Sweet potato','g',86,1.6,20,0.1,1000,'1 kg',3.99,'Fruit & veg'],
  potato:['Potatoes','g',77,2,17.5,0.1,2000,'2 kg bag',4.49,'Fruit & veg'],
  capsicum:['Capsicum','g',26,1,6,0.3,450,'3-pack (~450 g)',3.99,'Fruit & veg'],
@@ -130,98 +148,253 @@ const ING={
  noodles:['Dry wheat noodles','g',371,13,75,1.5,400,'400 g pack',2.29,'Tins & dry'],
  oats:['Rolled oats','g',389,16.9,66,6.9,1000,'1 kg bag',2.79,'Tins & dry'],
  beansBlack:['Black or kidney beans, tinned','g',95,6.3,16.5,0.4,240,'400 g tin (~240 g drained)',1.09,'Tins & dry'],
- beansWhite:['Cannellini beans, tinned','g',105,7,18.5,0.4,240,'400 g tin (~240 g drained)',0.99,'Tins & dry'],
  chickpeas:['Chickpeas, tinned','g',139,7,22.5,2.5,240,'400 g tin (~240 g drained)',0.99,'Tins & dry'],
  corn:['Corn kernels, tinned','g',80,2.6,17,1.2,270,'420 g tin (~270 g drained)',1.29,'Tins & dry'],
  tuna:['Tuna in springwater','g',110,25,0,1,300,'425 g tin (~300 g drained)',4.49,'Tins & dry'],
  passata:['Passata','g',30,1.4,5.5,0.2,700,'700 g bottle',1.49,'Tins & dry'],
  coconut:['Light coconut milk','g',75,0.7,2.5,7,400,'400 ml tin',1.49,'Tins & dry'],
- salsa:['Salsa','g',36,1.5,7,0.2,300,'300 g jar',2.49,'Tins & dry'],
  pesto:['Basil pesto','g',418,5,6,41,190,'190 g jar',3.49,'Tins & dry'],
  peas:['Frozen peas','g',77,5.2,13.6,0.4,1000,'1 kg bag',2.69,'Freezer'],
  stirfry:['Frozen stir-fry vegetables','g',35,2,6,0.3,1000,'1 kg bag',3.49,'Freezer'],
  mixveg:['Frozen mixed vegetables','g',60,3,11,0.5,1000,'1 kg bag',2.99,'Freezer'],
  edamame:['Frozen shelled edamame','g',121,11.9,8.9,5.2,400,'400 g bag',3.99,'Freezer'],
+ chickmince:['Chicken mince','g',143,17.4,0,8.1,500,'500 g pack',6.99,'Meat & fish'],
+ cauli:['Cauliflower','g',25,1.9,5,0.3,1000,'1 whole (~1 kg)',3.99,'Fruit & veg'],
+ eggplant:['Eggplant','g',25,1,5.9,0.2,300,'1 small (~300 g)',2.49,'Fruit & veg'],
+ cottage:['Cottage cheese, 97% fat free','g',70,12,3.5,1,500,'500 g tub',4.49,'Fridge'],
+ feta_rf:['Reduced-fat feta','g',200,18,1,14,200,'200 g block',3.99,'Fridge'],
+ evap:['Light evaporated milk','g',85,7.5,10.5,1.6,375,'375 ml tin',2.29,'Tins & dry'],
+ tompaste:['Tomato paste','g',82,4.3,19,0.5,140,'140 g tub',0.99,'Tins & dry'],
+ dicedtom:['Diced tomatoes, tinned','g',20,1,3.5,0.2,400,'400 g tin',0.89,'Tins & dry'],
+ lentils:['Lentils, tinned','g',100,7,15,0.5,240,'400 g tin (~240 g drained)',1.19,'Tins & dry'],
+ lentilsDry:['Dried green or puy lentils','g',352,24.6,63,1.1,500,'500 g bag',2.49,'Tins & dry'],
+ rump:['Rump steak, lean','g',125,22,0,4,500,'500 g pack',10.49,'Meat & fish'],
+ cabbage:['Cabbage or wombok','g',25,1.3,5.8,0.1,1000,'½ cabbage (~1 kg)',2.99,'Fruit & veg'],
+ greenbeans:['Green beans','g',31,1.8,7,0.2,250,'250 g bag',2.99,'Fruit & veg'],
+ broccoli:['Broccolini or broccoli','g',34,2.8,6.6,0.4,350,'2 bunches (~350 g)',3.99,'Fruit & veg'],
+ mushrooms:['Mushrooms','g',22,3.1,3.3,0.3,200,'200 g punnet',2.49,'Fruit & veg'],
+ pumpkin:['Butternut pumpkin','g',45,1,11,0.1,1000,'~1 kg piece',2.99,'Fruit & veg'],
+ beetroot:['Beetroot','g',43,1.6,9.6,0.2,500,'500 g bunch',2.49,'Fruit & veg'],
+ pita:['Wholemeal pita bread','g',255,9,50,1.5,350,'5-pack (~350 g)',2.29,'Bakery'],
+ bocconcini:['Bocconcini','g',220,17,1,16,220,'220 g tub',4.49,'Fridge'],
  oil:['Olive oil','g',884,0,0,100,750,'750 ml bottle',8.79,'Pantry',1],
  soy:['Soy sauce','g',53,8.1,4.9,0.6,500,'500 ml bottle',2.29,'Pantry',1],
  honey:['Honey','g',304,0.3,82,0,500,'500 g jar',4.99,'Pantry',1],
- sweetchilli:['Sweet chilli sauce','g',220,0.4,53,0.3,290,'290 ml bottle',1.99,'Pantry',1],
  pb:['Peanut butter','g',588,25,20,50,375,'375 g jar',2.99,'Pantry',1],
  lemon:['Lemon or lime juice','g',22,0.4,7,0.2,250,'250 ml bottle',1.79,'Pantry',1],
  garlic:['Crushed garlic (jar)','g',120,5,25,0.5,200,'200 g jar',2.49,'Pantry',1],
  ginger:['Minced ginger (jar)','g',80,1.8,18,0.8,200,'200 g jar',2.79,'Pantry',1],
- taco:['Taco / fajita / chilli seasoning','g',300,8,55,5,35,'35 g packet',0.89,'Pantry',1],
  curry:['Curry powder','g',325,14,58,14,50,'50 g jar',1.99,'Pantry',1],
  spice:['Paprika, cumin, dried herbs','g',290,13,55,9,40,'40 g jar',1.49,'Pantry',1],
+ tandoori:['Tandoori paste','g',130,2.5,12,8,280,'280 g jar',3.49,'Pantry',1],
+ curryp:['Tikka or rogan josh curry paste','g',350,4,13,31,280,'280 g jar',3.49,'Pantry',1],
+ crumbs:['Breadcrumbs','g',370,13,68,4,500,'500 g bag',1.99,'Pantry',1],
+ cornflour:['Cornflour','g',381,0.3,91,0.1,500,'500 g box',1.49,'Pantry',1],
+ hoisin:['Hoisin sauce','g',220,3.3,44,3.4,250,'250 ml bottle',2.49,'Pantry',1],
+ oyster:['Oyster sauce','g',51,1.4,11,0.3,250,'250 ml bottle',2.49,'Pantry',1],
+ sugar:['Sugar (white or brown)','g',390,0,98,0,1000,'1 kg bag',1.99,'Pantry',1],
+ cashews:['Roasted cashews','g',553,18,30,44,200,'200 g bag',3.99,'Pantry',1],
+ peanuts:['Roasted peanuts','g',585,24,21,50,375,'375 g bag',3.49,'Pantry',1],
+ walnuts:['Walnuts','g',654,15,14,65,150,'150 g bag',3.99,'Pantry',1],
+ tahini:['Tahini','g',595,17,21,54,375,'375 g jar',4.99,'Pantry',1],
+ chutney:['Fruit chutney','g',150,1,36,0.3,250,'250 g jar',2.99,'Pantry',1],
+ fishsauce:['Fish sauce','g',35,5,3.6,0,200,'200 ml bottle',2.49,'Pantry',1],
  powder:['Protein powder (Myprotein, 30 g scoop)','g',387,75.3,6,6.3,1000,'1 kg bag (33 scoops)',55.00,'Not from Aldi',1],
 };
 const RECIPES=[
- {id:1,n:'Chicken burrito bowls',s:4,min:30,ing:{chicken:800,rice:240,beansBlack:240,corn:240,capsicum:300,salsa:200,cheddar:80,oil:10,taco:8},
-  m:['Cook the rice following the packet.','Heat the oil in a large frying pan. Add the diced chicken and taco seasoning and cook for 6–8 min, stirring.','Add the sliced capsicum and cook until the chicken is cooked through. Stir in the drained beans and corn until hot.','Divide rice and chicken mix into 4 containers. Top with salsa and cheese.']},
- {id:2,n:'Chicken fajita rice',s:4,min:30,ing:{chicken:800,rice:280,capsicum:300,onion:150,passata:400,yoghurt:200,oil:10,lemon:30,taco:8},
-  m:['Cook the rice.','Heat the oil and fry the sliced chicken, onion, capsicum and fajita seasoning for 8–10 min.','Add the passata and simmer 8–10 min until the chicken is cooked.','Divide with the rice. Mix yoghurt with the citrus juice and keep it in 4 small separate pots; add after reheating.']},
- {id:3,n:'Chicken sweet-potato nacho bowls',s:4,min:40,ing:{chicken:800,sweetpot:1200,beansBlack:240,corn:240,cheddar:80,salsa:200,oil:15,taco:8},
-  m:['Heat the oven to 220°C (200°C fan).','Cut the sweet potato into small wedges, toss with 10 g oil and half the seasoning. Spread over two trays and roast 30–35 min, turning halfway.','Cook the diced chicken in the remaining 5 g oil with the rest of the seasoning. Stir in beans and corn.','Divide into 4, top with salsa and cheese. Wedges soften in the fridge; that is normal.']},
- {id:4,n:'Chicken pesto pasta',s:4,min:25,ing:{chicken:800,pasta:280,pesto:80,peas:300,spinach:200,lemon:30},
-  m:['Cook the pasta, adding the peas for the last 3 min. Keep a mug of pasta water.','Cook the diced chicken in a non-stick pan with a splash of water as needed (no oil counted).','Add the spinach and let it wilt.','Stir through pasta, peas, 80 g pesto (not the whole jar) and lemon juice. Loosen with pasta water.']},
- {id:5,n:'Chicken stir-fry noodles',s:4,min:25,ing:{chicken:800,noodles:280,stirfry:800,soy:60,honey:20,sweetchilli:30,garlic:10,ginger:10,oil:15},
-  m:['Cook the noodles following the packet; drain.','Mix soy, honey, sweet chilli, garlic and ginger.','Heat the oil and stir-fry the sliced chicken in two batches.','Cook the vegetables, return the chicken and add the sauce.','Toss through the noodles and heat until the chicken is fully cooked.'],
-  note:'Uses dry wheat noodles, not instant fried or fresh pouch noodles.'},
- {id:6,n:'Chicken tomato curry',s:4,min:35,ing:{chicken:800,rice:200,chickpeas:240,passata:400,mixveg:500,onion:150,garlic:10,oil:10,curry:12},
-  m:['Cook the rice.','Heat the oil and soften the onion 5 min. Add garlic and curry powder; stir 30 sec.','Add the chicken, passata, chickpeas, vegetables and about 150 ml water.','Simmer 15–20 min, stirring now and then, until the chicken is cooked. Divide with the rice.']},
- {id:7,n:'Beef taco sweet-potato bowls',s:4,min:40,ing:{beef:800,sweetpot:1200,beansBlack:240,corn:240,salsa:200,yoghurt:200,cheddar:60,oil:10,taco:8},
-  m:['Heat the oven to 220°C. Toss the diced sweet potato in oil and roast 30–35 min.','Brown the mince in a non-stick pan, breaking it up well.','Add taco seasoning and a splash of water. Stir in beans and corn and heat through.','Portion with sweet potato, salsa and cheese. Keep the yoghurt separate.']},
- {id:8,n:'Beef bolognese pasta',s:4,min:35,ing:{beef:800,pasta:280,passata:700,onion:150,carrot:200,zucchini:250,garlic:10,oil:10,spice:4},
-  m:['Heat the oil and cook the diced onion, grated carrot and grated zucchini for 5 min.','Add the mince and garlic. Cook, breaking it up, until browned throughout.','Add the passata and dried herbs; simmer 15–20 min.','Cook the pasta and divide with the sauce. Cheese is not counted.']},
- {id:9,n:'Beef chilli with rice',s:4,min:35,ing:{beef:800,rice:240,beansBlack:240,passata:400,onion:150,capsicum:300,garlic:10,oil:10,taco:12},
-  m:['Cook the rice.','Heat the oil and soften the onion and capsicum.','Add the mince and garlic; brown thoroughly.','Add chilli seasoning, passata, beans and 100–150 ml water.','Simmer 15–20 min. Divide with the rice.']},
- {id:10,n:'Beef, sweet-potato and egg hash',s:4,min:40,ing:{beef:800,sweetpot:1200,onion:150,capsicum:300,egg:4,oil:10,spice:8},
-  m:['Roast the diced sweet potato with the oil at 220°C for 30–35 min.','Brown the mince with onion, capsicum and smoked paprika/cumin.','Stir through the cooked sweet potato.','Hard-boil the 4 eggs, cool and peel. One egg per container.']},
- {id:11,n:'Beef meatballs with pasta',s:4,min:40,ing:{beef:800,pasta:280,egg:1,oats:40,passata:700,onion:150,garlic:10,oil:10,spice:4},
-  m:['Heat the oven to 200°C.','Mix mince, egg, oats and half the herbs. Roll 20 small meatballs.','Bake on baking paper 20–25 min until cooked through.','Meanwhile heat the oil, soften onion and garlic, add passata and remaining herbs; simmer 15 min.','Cook the pasta and serve with meatballs and sauce.']},
- {id:12,n:'Beef kofta bowls',s:4,min:30,ing:{beef:800,rice:240,cucumber:300,tomato:400,lettuce:200,yoghurt:200,lemon:30,oil:10,spice:8},
-  m:['Cook the rice.','Mix the mince with cumin/paprika/garlic and shape 12 small flat koftas.','Heat the oil and pan-fry, turning often, until cooked through.','Mix the yoghurt with lemon juice.','Rice and koftas go in the containers. Pack salad and dressing separately; add after reheating.']},
- {id:13,n:'Turkey meatballs with sweet potato',s:4,min:45,ing:{turkey:800,sweetpot:1200,egg:1,oats:40,passata:700,onion:150,garlic:10,oil:10,spice:4},
-  m:['Heat the oven to 220°C. Toss the diced sweet potato with the oil and roast 30–35 min.','Mix turkey, egg, oats and half the herbs. Roll 20 small meatballs.','Bake on a separate lined tray 18–25 min; the centre must reach 74°C.','Simmer onion, garlic, passata and remaining herbs, covered, with a splash of water for 15–20 min.','Divide sweet potato, meatballs and sauce.']},
- {id:14,n:'Pork and apple meatballs',s:4,min:45,ing:{pork:800,apple:1,egg:1,oats:40,potato:1000,mixveg:800,garlic:10,oil:10,spice:4},
-  m:['Heat the oven to 220°C. Toss the diced potatoes in the oil and roast 35–40 min.','Mix pork, 1 grated apple, egg, oats, garlic and sage/herbs. Roll 20 small meatballs.','Bake on a separate tray 20–25 min until cooked through.','Microwave or steam the vegetables and portion everything.'],
-  note:'Assumes pork mince with about 10 g fat per 100 g. Check your packet.'},
- {id:15,n:'Sausage, bean and veg tray bake',s:4,min:45,ing:{sausage:500,beansWhite:480,potato:1000,capsicum:300,onion:150,zucchini:400,oil:10,spice:8},
-  m:['Heat the oven to 220°C.','Toss small diced potatoes, capsicum and onion wedges with oil and seasoning. Roast 15 min.','Add the sausages and thick zucchini slices. Roast another 20–25 min, turning the sausages.','Add the beans for the last 10 min. Check the sausages are cooked through.'],
-  note:'Lowest protein in the bank. Assumes sausages at 250 kcal and 14 g protein per 100 g; check the label.'},
- {id:16,n:'Tuna sweet-potato jackets',s:4,min:20,ing:{sweetpot:1200,tuna:600,corn:240,beansBlack:240,yoghurt:200,cheddar:80,lettuce:200,spice:4},
-  m:['Pierce 4 similar-sized sweet potatoes and microwave until soft, turning halfway. Do it in batches if needed.','Mix the drained tuna, corn, beans, yoghurt and paprika.','Split the potatoes and add the filling.','Top with cheese and grill until hot and melted. Serve with lettuce.']},
- {id:17,n:'Salmon rice bowls',s:4,min:25,ing:{salmon:800,rice:200,cucumber:300,carrot:300,soy:60,honey:20,lemon:30},
-  m:['Cook the rice. Heat the oven to 200°C.','Mix soy, honey and lemon. Brush half over the salmon.','Bake the salmon on baking paper 12–18 min, depending on thickness, until cooked through.','Divide with rice, cucumber and grated carrot. Keep the unused sauce separate (it never touched raw fish).'],
-  note:'Highest fat in the bank because of farmed salmon.'},
- {id:18,n:'Chickpea, tofu and coconut curry',s:4,min:30,ing:{chickpeas:480,tofu:600,coconut:400,passata:400,onion:150,spinach:400,rice:160,garlic:10,oil:10,curry:12},
-  m:['Cook the rice.','Heat the oil and soften the onion. Add garlic and curry powder for 30 sec.','Add passata, coconut milk, chickpeas and cubed tofu.','Simmer gently 15 min. Stir in the spinach until hot.','Divide with the rice.']},
- {id:19,n:'Tofu peanut noodles',s:4,min:30,ing:{tofu:800,noodles:240,stirfry:800,pb:60,soy:60,honey:20,garlic:10,ginger:10,oil:10,lemon:30},
-  m:['Cook the noodles.','Whisk peanut butter, soy, honey, garlic, ginger and citrus with enough warm water to make a sauce.','Heat the oil in a large non-stick pan. Brown the cubed tofu in batches.','Cook the vegetables, then add tofu, noodles and sauce. Toss until hot.']},
- {id:20,n:'Chicken and egg fried rice',s:4,min:30,ing:{rice:240,egg:8,chicken:400,mixveg:800,garlic:10,soy:60,oil:15},
-  m:['Cook the rice. Use it freshly cooked and well drained; do not leave it sitting on the bench.','Heat 5 g oil, scramble the eggs until set, then take them out.','Heat the remaining oil and cook the small-diced chicken thoroughly.','Add vegetables and garlic; cook until hot.','Add rice, eggs and soy. Stir-fry until steaming hot.']},
- {id:21,n:'Warm chicken, sweet-potato and feta salad',s:1,min:30,ing:{chicken:220,sweetpot:250,lettuce:80,cucumber:100,tomato:150,feta:30,oil:5,lemon:15,spice:2},
-  m:['Toss the diced sweet potato with 3 g oil. Roast at 220°C 25–30 min, or microwave until tender.','Season the chicken and cook it in the remaining 2 g oil until cooked through. Slice.','Fill a large bowl with leaves, cucumber and tomato.','Add warm sweet potato, chicken and crumbled feta. Dress with lemon.']},
- {id:22,n:'Tuna, white-bean and crunchy salad',s:1,min:10,ing:{tuna:200,beansWhite:120,lettuce:80,cucumber:150,tomato:150,carrot:100,bread:60,oil:5,lemon:15},
-  m:['Rinse and drain the beans.','Chop the vegetables and combine with leaves, beans and tuna.','Dress with oil and lemon.','Serve with 60 g toasted wholemeal bread.']},
- {id:23,n:'Chicken and avocado taco salad',s:1,min:20,ing:{chicken:200,beansBlack:100,corn:80,avocado:60,lettuce:100,tomato:150,yoghurt:50,salsa:50,oil:5,taco:2},
-  m:['Heat the oil and cook the sliced chicken with taco seasoning until cooked through.','Put chopped lettuce, tomato, beans and corn in a large bowl.','Add the chicken and 60 g avocado.','Mix yoghurt and salsa as the dressing. Tortilla chips are not counted.']},
- {id:24,n:'Warm salmon and potato salad',s:1,min:25,ing:{salmon:180,potato:250,peas:80,lettuce:80,cucumber:100,yoghurt:60,lemon:15},
-  m:['Boil the diced potatoes until tender; add the peas for the last 3 min. Drain.','Bake the salmon on baking paper at 200°C for 12–18 min until cooked through.','Mix yoghurt and lemon with a little water.','Combine potatoes, peas, leaves and cucumber. Add the salmon and dressing.']},
- {id:25,n:'Crispy tofu, edamame and peanut salad',s:1,min:20,ing:{tofu:220,edamame:100,stirfry:250,carrot:100,pb:15,soy:15,lemon:15,oil:5},
-  m:['Pat the tofu dry and cut into small cubes.','Heat the oil in a non-stick pan and fry the tofu until golden.','Cook the edamame and stir-fry vegetables following their packets. Cool slightly.','Mix peanut butter, soy, citrus and warm water into a dressing.','Toss vegetables, carrot, tofu, edamame and dressing.']},
+ // 1–25 replaced 2026-11-14 with published recipes (each has src). Scaled up for big portions; notes say what changed.
+ {id:1,n:'Chicken, rice and bean bowls',s:4,min:25,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/chicken-rice-and-bean-bowl'],
+  ing:{chicken:800,spice:3,lemon:60,oil:18,greenbeans:250,rice:240,spinach:80,beansBlack:240,tomato:250,corn:270},
+  m:['Mix lemon juice, a little zest, paprika and the oil in a dish. Turn the chicken through it.','Steam or microwave the green beans 2–3 min until just tender.','Cook the rice.','Grill or pan-fry the chicken 3–4 min a side until cooked through. Slice.','Divide rice, spinach, black beans, halved cherry tomatoes, corn, green beans and chicken between containers. Lemon wedge to serve.'],
+  note:'Changed: chicken 500 g → 800 g; plain rice instead of microwave brown rice and quinoa.'},
+ {id:2,n:'Chicken fajita rice bowls',s:4,min:30,src:['RecipeTin Eats','https://www.recipetineats.com/chicken-fajitas/'],
+  ing:{chicken:800,lemon:60,oil:30,garlic:6,spice:5,capsicum:450,onion:200,rice:280,avocado:140,yoghurt:120},
+  m:['Mix lime (or lemon) juice, half the oil, garlic, cumin, salt and pepper. Coat the chicken (breasts halved horizontally) and marinate at least 1 hour, or overnight.','Cook the rice.','Heat a little oil in a heavy pan until smoking. Cook the sliced capsicum and onion in a single layer, tossing every 45 sec, until charred at the edges. Do it in batches.','Cook the chicken in the remaining oil over medium-high heat, 3–4 min a side until caramelised and cooked through. Rest 3 min, then slice.','Divide rice, peppers and chicken. Add avocado and yoghurt on the day.'],
+  note:'Changed: rice instead of tortillas, plain yoghurt instead of sour cream, oil cut from 4 tbsp to about 1½, chicken 700 g → 800 g.'},
+ {id:3,n:'Gyros chicken bowls with sweet potato fries',s:4,min:40,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/gyros-chicken-bowls'],
+  ing:{chicken:800,garlic:6,spice:5,oil:40,sweetpot:1000,tomato:360,cucumber:260,onion:80,feta_rf:100,lettuce:200,yoghurt:125},
+  m:['Toss the chicken pieces with garlic, lemon zest, most of the oregano, 1½ tbsp oil and pepper. Chill.','Cut the sweet potato into thick fries, pat dry, toss with the rest of the oil and oregano. Bake on lined trays at 220°C for 20–25 min until crisp.','Cook the chicken in a non-stick pan 6–8 min, turning, until golden and cooked through. Rest 5 min.','Toss chopped tomato, cucumber, sliced red onion and cubed feta.','Divide lettuce, salad, chicken and fries. Serve with yoghurt mixed with grated cucumber and garlic (quick tzatziki).'],
+  note:'Changed: chicken 600 g → 800 g, sweet potato 600 g → 1 kg, homemade yoghurt tzatziki, olives left out.'},
+ {id:4,n:'Pesto chicken and chickpea pasta',s:4,min:30,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/pesto-chicken-chickpea-pasta'],
+  ing:{pasta:250,oil:10,chicken:800,chickpeas:240,tomato:200,garlic:5,cornflour:6,evap:375,pesto:20,spinach:100},
+  m:['Cook the pasta until al dente. Drain.','Brown the diced chicken in the oil in a large non-stick pan, 3–4 min.','Add chickpeas, halved cherry tomatoes and garlic; cook 2 min.','Mix the cornflour with 250 ml salt-reduced chicken stock. Add with the evaporated milk, pesto and 2 tsp Dijon mustard. Bring to the boil, then simmer 3 min until thick and the chicken is cooked.','Stir in the spinach until wilted. Serve with the pasta.'],
+  note:'Changed: chicken 400 g → 800 g, pasta 170 g → 250 g, cherry tomatoes instead of sundried tomato strips.'},
+ {id:5,n:'Chicken chow mein',s:4,min:25,src:['RecipeTin Eats','https://www.recipetineats.com/chicken-chow-mein/'],
+  ing:{chicken:800,cabbage:560,oil:30,garlic:10,noodles:280,carrot:150,cornflour:8,soy:50,oyster:50,sugar:8},
+  m:['Sauce: mix the cornflour into the soy, then add oyster sauce, 3 tbsp Chinese cooking wine or water, sugar, a few drops of sesame oil and white pepper.','Toss the sliced chicken with 2 tbsp of the sauce; leave 10 min.','Prepare the noodles following the packet. Drain.','Heat the oil in a wok on high. Fry the garlic 10 sec, then the chicken until browned outside.','Add shredded cabbage, carrot and spring onion whites; stir-fry 1½ min.','Add noodles, the rest of the sauce and 125 ml water. Toss 1–2 min until the chicken is cooked through.'],
+  note:'Changed: source serves 2; this is doubled with chicken 400 g → 800 g. Bean sprouts optional, not counted.'},
+ {id:6,n:'Chicken curry',s:4,min:30,src:['RecipeTin Eats','https://www.recipetineats.com/chicken-curry/'],
+  ing:{oil:20,garlic:6,ginger:10,onion:100,chicken:800,curry:20,coconut:400,peas:160,rice:240},
+  m:['Cook the rice.','Heat the oil and cook garlic, ginger and onion 3 min until soft.','Add the sliced chicken and cook until it turns white. Add the curry powder and cook 2 min.','Add the coconut milk and 375 ml low-salt chicken stock. Simmer briskly 10 min until thickened.','Add the peas and salt; cook 2 min. Divide with the rice.'],
+  note:'Changed: breast instead of thigh, 500 g → 800 g; light coconut milk instead of full-fat.'},
+ {id:7,n:'Smokey bean and beef burrito bowls',s:4,min:30,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/smokey-bean-and-beef-burrito-bowl'],
+  ing:{rump:800,spice:8,sugar:4,oil:5,cabbage:400,carrot:300,beansBlack:240,tomato:200,cucumber:300,avocado:140,yoghurt:80,rice:240},
+  m:['Mix smoked paprika, cumin, chilli powder and brown sugar. Rub over the steak and spray with oil.','Cook the rice.','Grill the steak on a hot chargrill or pan 2–3 min a side. Rest 5 min, then slice thinly.','Toss shredded cabbage, grated carrot and coriander as a slaw.','Divide rice, slaw, kidney beans, cherry tomatoes, cucumber and beef. Add avocado and a spoon of yoghurt on the day.'],
+  note:'Changed: steak 400 g → 800 g, rice added so it fills you up.'},
+ {id:8,n:'Spaghetti bolognese',s:4,min:40,src:['RecipeTin Eats','https://www.recipetineats.com/spaghetti-bolognese/'],
+  ing:{oil:15,garlic:6,onion:150,beef:800,dicedtom:800,tompaste:40,sugar:8,spice:2,pasta:280},
+  m:['Cook the onion and garlic in the oil 3 min until golden.','Turn the heat up, add the mince and break it up until browned.','Add 125 ml red wine or water and scrape the pan for 1 min.','Add crushed tomatoes, tomato paste, 2 crumbled beef stock cubes, sugar, 2 tsp Worcestershire, bay leaves, thyme, salt and pepper. Simmer gently 20–30 min, uncovered, adding water if it gets too thick.','Cook the pasta 1 min short of the packet time. Toss with the sauce and a splash of pasta water for 2 min.'],
+  note:'Changed: 5% fat beef raised from 500 g to 800 g, oil cut from 1½ tbsp to 1, parmesan not counted.'},
+ {id:9,n:'Chilli con carne with rice',s:4,min:45,src:['RecipeTin Eats','https://www.recipetineats.com/chilli-con-carne/'],
+  ing:{oil:15,garlic:9,onion:150,capsicum:200,beef:800,tompaste:60,dicedtom:800,beansBlack:240,sugar:6,spice:40,rice:240},
+  m:['Cook the rice.','Cook garlic and onion in the oil 1 min, add the diced capsicum for 2 min.','Turn the heat up, add the mince and break it up.','Add the spice mix (cayenne, paprika, cumin, garlic and onion powder, oregano) and cook until the beef is browned all over.','Add tomato paste, crushed tomatoes, drained kidney beans, 2 crumbled stock cubes, sugar, salt and 125 ml water. Simmer gently 20–40 min, uncovered.'],
+  note:'Changed: beef raised from 500 g to 800 g. Serve toppings like sour cream and cheese are not counted.'},
+ {id:10,n:'Beef rissoles with sweet potato mash',s:4,min:45,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/vegeful-beef-rissoles-with-sweet-potato-mash'],
+  ing:{beef:800,onion:100,carrot:80,zucchini:120,crumbs:50,cheddar:30,chutney:40,spice:4,egg:1,oil:18,broccoli:350,sweetpot:800,potato:300,milk:40},
+  m:['Mix mince, onion, grated carrot and zucchini, breadcrumbs, grated parmesan (or cheddar), chutney, dried herbs, egg and pepper. Shape 16 patties.','Cook in the oil in two batches, about 5 min a side, until browned and cooked through.','Boil the sweet potato and potato about 20 min until tender. Drain and mash with the milk.','Steam or microwave the broccolini.','Divide rissoles, mash and greens. Extra chutney to serve is not counted.'],
+  note:'Changed: beef 500 g → 800 g, mash doubled.'},
+ {id:11,n:'Italian meatball pasta with green salad',s:4,min:40,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/italian-meatball-pasta-with-green-salad'],
+  ing:{beef:800,egg:1,garlic:6,spice:1,oil:5,onion:200,carrot:200,tomato:680,dicedtom:400,pasta:280,spinach:120,cucumber:150},
+  m:['Mix the mince, egg, chopped parsley, garlic and pepper. Roll tablespoons into balls.','Brown the meatballs in a sprayed non-stick pan, 4–5 min. Take them out.','Soften the onion and diced carrot 1–2 min. Add chopped fresh tomatoes, tinned tomatoes and the meatballs; simmer 10–15 min until cooked through. Stir in basil.','Cook the spaghetti until al dente.','Pack the salad (spinach, cucumber, red onion, cherry tomatoes) separately.'],
+  note:'Changed: beef 400 g → 800 g, pasta 300 g → 280 g.'},
+ {id:12,n:'Smashed beef kofta with cucumber yoghurt',s:4,min:25,src:['RecipeTin Eats','https://www.recipetineats.com/smashed-beef-kofta-with-cucumber-yogurt-sauce/'],
+  ing:{oil:15,beef:800,onion:200,spice:15,walnuts:30,cucumber:250,yoghurt:375,pita:280},
+  m:['Grate the cucumber into the yoghurt, add sliced mint and salt.','Grate the onion and mix with the mince, cumin, coriander, paprika, cinnamon, a pinch of cayenne and salt.','Heat the oil in a large non-stick pan. Drop in rough 2–3 cm lumps of beef and leave 5–7 min until dark golden underneath.','Flip as best you can, add the walnuts and cook 1–2 min more until cooked through.','Pack beef with the yoghurt sauce and a warm pita each. A drizzle of pomegranate molasses or balsamic glaze is optional.'],
+  note:'Changed: beef 500 g → 800 g (5% fat), non-fat Greek yoghurt instead of full-fat, cranberries left out.'},
+ {id:13,n:'Turkey and lentil kofta with roast veg',s:4,min:45,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/turkey-and-lentil-kofta'],
+  ing:{turkey:800,lentils:400,feta_rf:160,spice:15,garlic:10,oil:15,sweetpot:1000,zucchini:300,capsicum:200},
+  m:['Heat the oven to 220°C. Toss diced sweet potato, zucchini and capsicum with the oil on a large tray. Roast 30–35 min.','Coarsely mash the lentils. Mix in the turkey, crumbled feta, oregano, allspice, garlic and pepper.','Shape about 32 oval kofta and bake on a lined tray 18–22 min until the centre reaches 74°C.','Divide veg and kofta.'],
+  note:'Changed: source is a 1 kg base batch for later meals; this uses 800 g turkey, and the veg tray matches its follow-up tray bake.'},
+ {id:14,n:'Honey soy meatball bake',s:4,min:45,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/one-pan-honey-soy-meatball-bake'],
+  ing:{bread:60,milk:80,egg:1,beef:800,ginger:6,garlic:6,carrot:300,capsicum:200,broccoli:300,rice:240,honey:40,soy:20,oil:5},
+  m:['Soak the torn bread in the milk 5 min, then beat in the egg.','Mix in the mince, ginger, garlic and pepper. Roll heaped tablespoons into balls.','Spray a roasting pan with oil. Bake the meatballs and carrot batons at 200°C for 15 min. Cook the rice.','Whisk honey, soy and 1 tbsp boiling water. Add capsicum to the pan, pour over the glaze, toss. Bake at 220°C another 15–20 min until cooked through.','Steam the broccolini and add. Divide with the rice.'],
+  note:'Changed: beef 500 g → 800 g, rice 2 cups cooked → 240 g dry.'},
+ {id:15,n:'One-pan sausage and lentils',s:4,min:60,src:['RecipeTin Eats','https://www.recipetineats.com/one-pan-baked-sausage-and-lentils/'],
+  ing:{oil:20,onion:120,garlic:9,spice:6,lentilsDry:285,carrot:250,sausage:680},
+  m:['Heat the oven to 200°C (180°C fan).','In a metal roasting pan on the stove, sauté sliced shallots and garlic in the oil 3 min. Add cumin seeds for 1 min.','Add the dried lentils, diced carrot, salt, pepper and 750 ml low-salt chicken stock. Bring to a simmer.','Sit the sausages on top. Cover with baking paper pressed onto the stock.','Bake 25 min, uncover and bake 20 min more to brown the sausages. Rest 5 min.'],
+  note:'Changed: oil cut from 3 tbsp to about 1. Lower protein than most; sausages vary, check the label.'},
+ {id:16,n:'Veggie-ful tuna pasta bake',s:4,min:50,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/veggie-ful-tuna-pasta-bake'],
+  ing:{oil:18,onion:150,garlic:5,carrot:300,mushrooms:150,tompaste:140,dicedtom:400,spice:4,zucchini:280,pasta:280,tuna:600,bocconcini:120},
+  m:['Cook onion and garlic in the oil 3–5 min. Add grated carrot and chopped mushrooms; cook 10 min.','Stir in the tomato paste 1 min, then the tomatoes, 250 ml water, a salt-reduced stock cube and oregano. Simmer 8–10 min until thick. Stir in grated zucchini and basil.','Cook the pasta until al dente.','Mix pasta, sauce and drained tuna in a baking dish. Top with torn bocconcini.','Bake at 200°C for 20–25 min until golden.'],
+  note:'Changed: tuna doubled to two 425 g tins, pasta 250 g → 280 g.'},
+ {id:17,n:'Salmon and rice bowls',s:4,min:25,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/salmon-rice-lunch-bowl'],
+  ing:{salmon:800,rice:240,edamame:200,avocado:140,soy:30,lemon:30,oil:5},
+  m:['Cook the rice. Cook the edamame following the packet, rinse in cold water.','Grill, bake (200°C, 12–15 min) or air-fry the salmon until just cooked through. Flake.','Dressing: soy, lime juice, crushed chilli and a few drops of sesame oil.','Divide rice, edamame and salmon. Keep the dressing separate.','Add avocado, seaweed and sesame seeds on the day.'],
+  note:'Changed: source is one small lunch (100 g raw salmon); this makes 4 big bowls with 200 g each.'},
+ {id:18,n:'Pumpkin and tofu satay',s:4,min:30,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/pumpkin-and-tofu-satay'],
+  ing:{pumpkin:600,tofu:600,oil:15,onion:150,curry:9,evap:250,pb:65,soy:40,greenbeans:200,rice:240},
+  m:['Cook the rice. Steam or microwave the pumpkin chunks until almost tender.','Pat the tofu strips dry. Fry tofu and onion wedges in the oil about 4 min until golden.','Add pumpkin and curry powder; stir 1 min.','Add evaporated milk, peanut butter, soy and 180 ml water. Bring to the boil.','Add the green beans and boil gently 3–4 min until tender and thick. Stir in coriander. Divide with rice.'],
+  note:'Changed: tofu raised from 175 g to 600 g so it has enough protein.'},
+ {id:19,n:'Honey soy tofu noodle stir-fry',s:4,min:20,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/step-by-step/honey-soy-tofu-noodle-stir-fry'],
+  ing:{noodles:270,oil:18,stirfry:600,garlic:6,edamame:300,tofu:600,cashews:45,honey:40,soy:40},
+  m:['Cook the noodles following the packet. Drain.','Heat the oil in a wok on high. Stir-fry the vegetables and garlic 1 min.','Add edamame and sliced tofu; stir-fry 2 min.','Add the noodles and half the cashews; toss until hot.','Add honey and soy and toss to coat. Top with the rest of the cashews.'],
+  note:'Changed: plain firm tofu 600 g with extra honey and soy instead of 200 g honey-soy tofu; edamame and veg raised; wheat noodles instead of soba.'},
+ {id:20,n:'Chicken fried rice',s:4,min:25,src:['RecipeTin Eats','https://www.recipetineats.com/chicken-fried-rice/'],
+  ing:{oil:20,egg:4,chicken:700,garlic:6,onion:75,carrot:100,corn:80,peas:80,rice:240,soy:45,oyster:15},
+  m:['Cook the rice and spread it out to cool quickly; day-old rice in the fridge is ideal.','Mix the soy, oyster sauce, 2 tbsp Chinese cooking wine, sesame oil and white pepper. Toss 2 tsp through the sliced chicken.','Scramble the eggs in 1 tbsp oil until just set. Take out.','On high heat, cook onion and garlic in the rest of the oil, then the carrot, corn and peas 1 min, then the chicken until white.','Add rice and sauce; stir-fry 1½ min. Toss the egg and spring onion through.'],
+  note:'Changed: chicken 150 g → 700 g and eggs 2 → 4 to make it a main; bacon left out.'},
+ {id:21,n:'Grilled chicken salad bowl with tahini',s:1,min:20,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/grilled-chicken-salad-bowl-with-tahini-dressing'],
+  ing:{tahini:10,garlic:2,lemon:10,oil:4,honey:2,chicken:220,lentils:100,beetroot:80,carrot:100,cucumber:100,spinach:30},
+  m:['Mix tahini, garlic, lemon, oil, honey and 1 tsp hot water until smooth.','Halve the chicken breast horizontally and cook in a sprayed pan 5–6 min a side until cooked through. Slice.','Fill a bowl with lentils, grated beetroot and carrot, cucumber batons and spinach. Add chicken and dressing.'],
+  note:'Changed: one big bowl with 220 g chicken and double lentils.'},
+ {id:22,n:'Greek tuna rice salad',s:1,min:15,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/greek-tuna-salad-jars'],
+  ing:{rice:60,oil:7,lemon:7,feta:25,tuna:200,capsicum:75,cucumber:70,tomato:60,lettuce:60},
+  m:['Cook the rice and cool it.','Mix oil, lemon and crumbled feta in the bottom of a bowl or jar. Add the tuna, then the rice.','Top with chopped capsicum, cucumber, cherry tomatoes, spring onion, dill and lettuce. Olives and pine nuts optional, not counted.'],
+  note:'Changed: one big serve with 200 g tuna; plain rice instead of microwave rice blend.'},
+ {id:23,n:'Mexican avocado chicken salad',s:1,min:25,src:['RecipeTin Eats','https://www.recipetineats.com/mexican-chicken-avocado-salad/'],
+  ing:{lemon:10,honey:7,oil:10,garlic:2,chicken:220,spice:2,avocado:60,tomato:100,corn:60,onion:25,lettuce:100},
+  m:['Shake lime juice, honey, half the oil, garlic, salt and pepper in a jar.','Coat the chicken with 2 tsp of the dressing, chipotle, oregano and cumin.','Cook in the rest of the oil over medium-low about 8 min until browned and cooked through. Rest 5 min, slice.','Toss avocado, corn, cherry tomatoes, red onion and coriander with a little dressing.','Pile cos lettuce, salsa and chicken; drizzle the rest of the dressing.'],
+  note:'Changed: one big serve with 220 g chicken; oil cut from ¼ cup for 3 people to 2 tsp.'},
+ {id:24,n:'Chilli lime salmon with potatoes and beans',s:1,min:40,src:['RecipeTin Eats','https://www.recipetineats.com/oven-baked-honey-chili-lime-salmon-with-potatoes-and-beans-one-tray-meal/'],
+  ing:{salmon:200,lemon:15,honey:10,soy:7,garlic:2,potato:300,oil:5,greenbeans:150},
+  m:['Heat the oven to 180°C with a tray inside. Marinate the salmon in lime zest and juice, honey, soy and garlic.','Toss halved baby potatoes in the oil and salt; roast on the hot tray 20 min.','Move the potatoes aside, add the salmon and green beans. Drizzle marinade on the salmon.','Bake about 5 min per 1.5 cm of salmon thickness, then grill 2 min with the rest of the marinade.','Grate chilli and lime zest over to serve.'],
+  note:'Changed: one big serve; olive oil instead of butter; potatoes and beans raised.'},
+ {id:25,n:'Asian tofu rice salad',s:1,min:25,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/asian-tofu-rice-salad'],
+  ing:{tofu:200,oil:5,rice:40,cabbage:150,carrot:60,edamame:80,peanuts:10,soy:10,honey:5},
+  m:['Pat the tofu strips dry. Fry in the oil over medium heat about 8 min, turning, until golden. Cool.','Dressing: soy, rice vinegar, honey and a few drops of sesame oil.','Toss tofu with cooked rice, shredded wombok, carrot, edamame, spring onion, coriander and chopped peanuts. Add the dressing.'],
+  note:'Changed: one big serve with 200 g tofu; edamame instead of snow peas for extra protein.'},
+ // 26–35: published recipes scaled up to 800 g meat for 4 big portions. Methods are paraphrased; see src for the original.
+ {id:26,n:'Tandoori chicken tray bake',s:4,min:55,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/tandoori-chicken-tray-bake'],
+  ing:{chicken:800,tandoori:40,yoghurt:90,sweetpot:1000,cauli:500,onion:150,oil:18,zucchini:500,capsicum:200},
+  m:['Heat the oven to 220°C (200°C fan).','Cut a few slashes in each chicken breast. Coat with the tandoori paste mixed with 2 tbsp of the yoghurt and chill while the veg starts.','Toss 2 cm sweet potato cubes, cauliflower florets and onion wedges with half the oil on a large tray (two if crowded). Roast 20 min.','Turn the veg, add zucchini and capsicum, sit the chicken on top and drizzle the rest of the oil. Roast 20–25 min until the chicken reaches 74°C.','Thin the remaining yoghurt with a little water. Keep it in small pots and add after reheating.'],
+  note:'Source: sweet potato raised from 700 g to 1 kg.'},
+ {id:27,n:'One-pan Mexican chicken',s:4,min:30,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/one-pan-mexican-chicken-with-tortilla-crisps'],
+  ing:{chicken:800,spice:10,garlic:5,oil:18,tompaste:40,dicedtom:400,beansBlack:240,cheddar:80,rice:240,lettuce:200,tomato:200},
+  m:['Cook the rice.','Slice each chicken breast in half horizontally into thin steaks. Coat in smoked paprika, cumin, ground coriander, garlic and the oil.','Brown the chicken in a large non-stick ovenproof pan, 2–3 min a side. Set aside.','Stir the tomato paste in the pan for 30 sec. Add tinned tomatoes, beans and about 180 ml water and bring to the boil.','Return the chicken and simmer uncovered about 5 min until cooked through. Top with cheese and grill 2 min until melted.','Divide with the rice. Pack lettuce and tomato separately.'],
+  note:'Source: chicken raised from 600 g to 800 g; rice instead of tortilla crisps.'},
+ {id:28,n:'Taco chicken bowls',s:4,min:25,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/taco-chicken-bowls'],
+  ing:{oil:5,onion:120,chickmince:800,spice:8,dicedtom:400,rice:240,lettuce:300,capsicum:200,beansBlack:240,avocado:140,feta_rf:60},
+  m:['Cook the rice.','Soften the finely chopped onion in the oil, then brown the chicken mince, breaking it up.','Stir in Mexican chilli powder and the tinned tomatoes. Simmer until thick.','Divide mince and rice into containers. Pack lettuce, capsicum, beans and feta separately. Cut the avocado on the day so it does not brown.'],
+  note:'Source: mince raised from 500 g to 800 g; dry rice instead of microwave rice cups.'},
+ {id:29,n:'Greek-style beef bowls',s:4,min:30,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/step-by-step/greek-style-beef-bowl'],
+  ing:{sweetpot:1000,oil:18,spice:6,beef:800,onion:150,passata:250,honey:42,capsicum:200,avocado:140,cottage:300},
+  m:['Heat the oven to 200°C. Toss 1 cm sweet potato cubes with half the oil and a little oregano and cinnamon. Roast about 20 min.','Brown the mince and onion in the rest of the oil, 6–8 min.','Add the passata, 125 ml water and the rest of the oregano and cinnamon. Simmer 10 min until thick.','Warm the honey with a pinch of chilli flakes until it bubbles.','Portion beef and sweet potato. Pack capsicum and cottage cheese separately, cut the avocado on the day and drizzle the hot honey to serve.'],
+  note:'Source: beef raised from 500 g to 800 g, sweet potato doubled, cottage cheese from 200 g to 300 g.'},
+ {id:30,n:'Tikka meatball curry',s:4,min:45,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/tikka-meatball-curry'],
+  ing:{beef:800,garlic:5,crumbs:55,carrot:130,egg:1,onion:150,curryp:40,cornflour:9,evap:375,peas:200,spinach:100,rice:240,oil:5},
+  m:['Mix the mince, garlic, breadcrumbs, grated carrot, egg and pepper. Roll about 24 balls.','Brown the meatballs in the oil in a large non-stick pan, turning, until cooked through. Set aside.','Cook the sliced onion with the tikka paste and a splash of water until soft.','Mix the cornflour with a little of the evaporated milk, then stir it in with the rest of the milk and bring to the boil.','Return the meatballs, add the peas and simmer until the sauce thickens. Stir in the spinach until wilted.','Cook the rice and divide.'],
+  note:'Source: beef raised from 500 g to 800 g; dry rice instead of microwave rice cups.'},
+ {id:31,n:'Qeema curried beef with peas',s:4,min:25,src:['RecipeTin Eats','https://www.recipetineats.com/qeema-indian-curried-beef/'],
+  ing:{oil:15,ginger:20,garlic:20,onion:200,beef:800,spice:10,peas:300,rice:280,yoghurt:200},
+  m:['Cook the rice.','Heat the oil on high. Fry the ginger and garlic 30 sec, then the finely diced onion for 1 min.','Add the mince and break it up until browned. Add garam masala, cumin, ground coriander, turmeric, chilli and salt; cook 2 min.','Add 250 ml water and the peas. Cover and simmer about 10 min until most of the water has gone.','Divide with the rice. Keep the yoghurt separate (stir in chopped mint if you have it).'],
+  note:'Source: beef raised from 500 g to 800 g (5% fat), oil cut from 3 tbsp to 1, peas added.'},
+ {id:32,n:'Asian beef bowls',s:4,min:20,src:['RecipeTin Eats','https://www.recipetineats.com/asian-beef-bowls/'],
+  ing:{hoisin:32,oyster:64,soy:60,sugar:13,oil:20,garlic:6,onion:100,beef:800,rice:280,stirfry:600},
+  m:['Cook the rice.','Mix the hoisin, oyster sauce, soy, sugar, a few drops of sesame oil and pepper.','Heat the oil on high. Cook the garlic and chopped onion 1 min.','Add the mince and break it up until no pink remains.','Add the stir-fry veg for 3–4 min, then the sauce for 2 min until it coats everything.','Divide with the rice. Top with sliced spring onion.'],
+  note:'Source: beef raised from 500 g to 800 g with the sauce scaled to match; stir-fry veg added.'},
+ {id:33,n:'Vietnamese caramelised chicken bowls',s:4,min:20,src:['RecipeTin Eats','https://www.recipetineats.com/vietnamese-caramelised-pork-bowls/'],
+  ing:{oil:20,onion:80,ginger:10,garlic:6,chickmince:800,sugar:70,fishsauce:55,rice:280,cucumber:300,tomato:300},
+  m:['Cook the rice.','Heat the oil on high. Cook the onion, ginger and garlic (and chilli if you like) 2 min.','Add the chicken mince and break it up until no longer pink.','Add the brown sugar and fish sauce. Leave it unstirred until the juices cook off and it browns, then stir. Repeat twice more.','Divide with the rice. Pack cucumber and tomato separately.'],
+  note:'Source is written for pork; the author says chicken works well. Mince raised from 500 g to 800 g, sugar kept at the original amount. Chicken breast mince gives more protein.'},
+ {id:34,n:'Indian chicken and lentil tray bake',s:4,min:35,src:['Heart Foundation','https://www.heartfoundation.org.au/recipes/indian-chicken-and-lentil-tray-bake'],
+  ing:{oil:9,onion:150,carrot:200,chicken:800,curryp:60,capsicum:200,tomato:480,eggplant:300,zucchini:200,lentils:180,rice:200},
+  m:['Heat the oven to 200°C. The source does not give a temperature.','Soften the onion and diced carrot in the oil 1–2 min. Add the chicken chunks and rogan josh paste and fry 2–3 min.','Tip into a large roasting tray with the capsicum, diced tomatoes, eggplant, zucchini, lentils and 100 ml water. Mix.','Cover tightly with foil and bake 20–25 min until the chicken is cooked through.','Cook the rice and divide.'],
+  note:'Source: chicken raised from 400 g to 800 g; white rice instead of quick brown rice.'},
+ {id:35,n:'Beef and rice with veggies',s:4,min:35,src:['RecipeTin Eats','https://www.recipetineats.com/ground-beef-and-rice-recipe/'],
+  ing:{oil:15,onion:150,capsicum:250,garlic:6,beef:800,tompaste:40,spice:8,rice:250,mixveg:400,spinach:90},
+  m:['Heat the oil in a large pot. Cook the onion, capsicum and garlic 1 min.','Brown the mince, breaking it up.','Stir in the tomato paste, cumin, oregano, onion powder, pepper and salt for 1 min.','Add the rice, 550 ml low-salt beef stock, the frozen veg and a bay leaf. Cover and simmer gently 12–15 min until the liquid is absorbed.','Scatter the spinach on top, cover and rest 10 min, then fluff and stir it through.'],
+  note:'Source makes 5 serves with 500 g beef; this makes 4 bigger ones with 800 g. Oil cut from 2 tbsp to 1.'},
 ];
 const BF={
- eggs:{n:'Eggs on toast',ing:{egg:3,bread:80},m:['Toast 2 slices wholemeal (80 g).','Scramble or poach 3 eggs in a non-stick pan. No butter.']},
- oats:{n:'Protein oats',ing:{oats:70,powder:30,yoghurt:100},m:['Microwave 70 g oats with about 250 ml water for 2–3 min, stirring halfway.','Cool 1 min, stir in a 30 g scoop of protein powder, top with 100 g Greek yoghurt.']},
+ eggs:{n:'Eggs on toast',src:['RecipeTin Eats (poached eggs)','https://www.recipetineats.com/poached-eggs/'],ing:{egg:3,bread:80},m:['Toast 2 slices wholemeal (80 g).','Scramble or poach 3 eggs in a non-stick pan. No butter.']},
+ oats:{n:'Protein oats',src:['Heart Foundation (hot oats)','https://www.heartfoundation.org.au/recipes/hot-oats'],ing:{oats:70,powder:30,yoghurt:100},m:['Microwave 70 g oats with about 250 ml water for 2–3 min, stirring halfway.','Cool 1 min, stir in a 30 g scoop of protein powder, top with 100 g Greek yoghurt.']},
 };
+// Photos load from the recipe sites themselves (not copied here); the service worker keeps a copy on the phone for offline.
+const IMG={
+ 1:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltdc5651e1a2636c10/65482b10ecbd1c040a7ed2be/chicken-rice-and-bean-bowl-recipe-header.jpg?width=480&quality=70',
+ 2:'https://www.recipetineats.com/tachyon/2017/04/Chicken-Fajitas_8.jpg?w=480',
+ 3:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt2aeb8cde5433e78d/655edf2b753911012cd0432e/gyros-chicken-bowls-recipe-header.jpg?width=480&quality=70',
+ 4:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blted8c3f3d3d2287af/65482bf4077aca040a534a04/pesto-chicken-chickpea-pasta-recipe-header.jpg?width=480&quality=70',
+ 5:'https://www.recipetineats.com/tachyon/2018/08/Chow-Mein_1.jpg?w=480',
+ 6:'https://www.recipetineats.com/tachyon/2019/03/Best-easy-Chicken-Curry_5.jpg?w=480',
+ 7:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltc6bdbd74c4ad4ac2/66cc166a5a70e52c552651c2/smokey-bean-and-beef-burrito-bowl-recipe-header.jpg?width=480&quality=70',
+ 8:'https://www.recipetineats.com/tachyon/2018/07/Spaghetti-Bolognese.jpg?w=480',
+ 9:'https://www.recipetineats.com/tachyon/2016/06/Chili-Con-Carne_8.jpg?w=480',
+ 10:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt64c7ac7930a5079f/66cc22d7fb244ed666700ad7/vegeful-beef-rissoles-with-sweet-potato-mash-recipe-header.jpg?width=480&quality=70',
+ 11:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt93b23bd418a7863c/65482b6b2f9d92040a177791/italian-meatball-pasta-with-green-salad-recipe-header.jpg?width=480&quality=70',
+ 12:'https://www.recipetineats.com/tachyon/2026/10/Smashed-Beef-Koftas-with-Yogurt-Sauce-2.jpg?w=480',
+ 13:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltcedb741715e6f245/6630676ab8b5ce0d1ddc4df2/Turkey-and-lentil-kofta-base.webp?width=480&quality=70',
+ 14:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt779af3a1bbfb8ec6/65482bfbb3460c040a0af94a/one-pan-honey-soy-meatball-bake-recipe-header.jpeg?width=480&quality=70',
+ 15:'https://www.recipetineats.com/tachyon/2023/03/Baked-sausage-with-lentils_9.jpg?w=480',
+ 16:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltb07299ef2adc6514/66d7c4e13206d0a2bcc47d9d/veggie-ful-tuna-pasta-bake-recipe-header.jpg?width=480&quality=70',
+ 17:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blte5faf887ce53fca0/65c564a3245ed92cd49106cf/Salmon-and-rice-lunch-bowl-header.jpg?width=480&quality=70',
+ 18:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltf23d2fc0f4e072b7/65482c05ecbd1c040a7ed2db/pumpkin-and-tofu-satay-recipe-header.jpg?width=480&quality=70',
+ 19:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt0dd264b7e3f237dc/670c512c0ecf4926e4700b38/Honey_soy_tofu_noodle_stir-fry_HERO.jpg?width=480&quality=70',
+ 20:'https://www.recipetineats.com/tachyon/2019/09/Chicken-fried-rice-copy.jpg?w=480',
+ 21:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt91da6c9e827365dc/66d7c953d8eb6a64603dde4d/grilled-chicken-salad-bowl-with-tahini-dressing-recipe-header.jpg?width=480&quality=70',
+ 22:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltf0cf98ba9cd0e7e1/656e81f5dc491b021df9549b/greek-tuna-salad-jars-recipe-header.jpg?width=480&quality=70',
+ 23:'https://www.recipetineats.com/tachyon/2017/05/Mexican-Chicken-Salad-4.jpg?w=480',
+ 24:'https://www.recipetineats.com/tachyon/2015/06/Chili-Lime-Salmon-Overhead.jpg?w=480',
+ 25:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt23a83cc3cb0feb35/66d92f3f1be6e16e89246e7f/asian-tofu-rice-salad-recipe-header.jpg?width=480&quality=70',
+ 26:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltd8c20baa9170c9fa/655aa1df3133db1c3a911214/tandoori-chicken-tray-bake-1920x1281.jpg?width=480&quality=70',
+ 27:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt18a115c6a218ad30/65482be586da6f040a437559/one-pan-mexican-chicken-with-tortilla-crisps-recipe-header.jpg?width=480&quality=70',
+ 28:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltfd4cd52e142b5204/65482cc361070f040a26e5ca/taco-chicken-bowls-recipe-header.jpg?width=480&quality=70',
+ 29:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt40071a4cf0ab9d22/69672d6311495d0008e17e08/Greek_style_beef_bowl_1200x600px.jpg?width=480&quality=70',
+ 30:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltd24042fa02b1dd69/6695c7a8ec61e98028bfd925/Tikka-meatball-curry.jpg?width=480&quality=70',
+ 31:'https://www.recipetineats.com/tachyon/2016/04/Queema-Indian-Curried-Beef-Mince_3.jpg?w=480',
+ 32:'https://www.recipetineats.com/tachyon/2017/05/Asian-beef-Bowls.jpg?w=480',
+ 33:'https://www.recipetineats.com/tachyon/2015/11/Vietnamese-Ground-Pork-Bowls_7.jpg?w=480',
+ 34:'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/bltafb7e3dabce884ce/66d7ca43d8eb6a7b653dde50/Indian-Chicken-Curry-Bake_1.jpg?width=480&quality=70',
+ 35:'https://www.recipetineats.com/tachyon/2018/02/Beef-Rice_7.jpg?w=480',
+ 'eggs':'https://www.recipetineats.com/tachyon/2020/10/Poached-Eggs.jpg?w=480',
+ 'oats':'https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt2feb55020205a957/65482b6bb3460c040a0af93e/hot-oats-recipe-header.jpg?width=480&quality=70'};
 const DAILY={apple:1,banana:1,pouch:1,milk:90}; // snacks + 3 small coffees
 const SHAKE={powder:30};
 function macros(ing){const t=[0,0,0,0];for(const k in ing){const d=ING[k],f=d[1]==='ea'?ing[k]:ing[k]/100;for(let i=0;i<4;i++)t[i]+=d[2+i]*f}return t}
 /*END*/
 
 const RB=Object.fromEntries(RECIPES.map(r=>[r.id,r]));
-const MEAT=['chicken','beef','turkey','pork','sausage','salmon'];
+const MEAT=['chicken','chickmince','beef','turkey','pork','sausage','salmon'];
 const DAYS=['Tue','Wed','Thu','Fri','Sat','Sun','Mon'];
 // [lunch, dinner] source per day. 'last' = the frozen portion from last week's Sunday cook; '*' = eaten from the freezer.
 const SLOTS=[['last','tue'],['tue','salad'],['tue','thu'],['thu','thu'],['thu','tue*'],['sun',null],['sun','sun']];
@@ -229,8 +402,9 @@ const AISLES=['Meat & fish','Fruit & veg','Fridge','Freezer','Bakery','Tins & dr
 const ACT=[[1.2,'Desk job, little exercise'],[1.375,'Light: about 10,000 steps a day, or 1–3 workouts a week'],[1.55,'Moderate: active job or 3–5 workouts a week'],[1.725,'Very active: physical job and regular training']];
 
 let S={plan:{bf:'eggs',tue:2,thu:8,sun:1,salad:22,shake:true,last:1},
-       me:{sex:'m',age:40,h:178,w:85,goal:78,act:1.375,budget:110,set:false},prices:{},ticks:{}};
-try{const s=JSON.parse(localStorage.getItem('prep-planner')||'null');if(s){Object.assign(S.plan,s.plan);Object.assign(S.me,s.me);S.prices=s.prices||{};S.ticks=s.ticks||{}}}catch(e){}
+       me:{sex:'m',age:40,h:178,w:85,goal:78,act:1.375,budget:110,set:false,adj:0,reached:false},
+       prices:{},ticks:{},log:[],stock:{},picks:{}};
+try{const s=JSON.parse(localStorage.getItem('prep-planner')||'null');if(s){Object.assign(S.plan,s.plan);Object.assign(S.me,s.me);for(const k of ['prices','ticks','log','stock','picks'])if(s[k])S[k]=s[k]}}catch(e){}
 const save=()=>{try{localStorage.setItem('prep-planner',JSON.stringify(S))}catch(e){}};
 
 const $=s=>document.querySelector(s);
@@ -245,34 +419,67 @@ function amt(k,q){const u=ING[k][1];if(u==='ea')return q+' ×';if(u==='ml')retur
 const line=m=>`${Math.round(m[0])} kcal · ${Math.round(m[1])} g protein · ${Math.round(m[2])} g carbs · ${Math.round(m[3])} g fat`;
 const src=key=>RB[S.plan[key.replace('*','')]];
 
+/* ---------- weight log ---------- */
+const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const shift=(day,n)=>{const d=new Date(day+'T12:00');d.setDate(d.getDate()+n);return iso(d)};
+const between=(a,b)=>S.log.filter(([d])=>d>a&&d<=b).map(x=>x[1]);
+const mean=xs=>xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:null;
+function wstats(){
+  if(!S.log.length)return null;
+  const last=S.log[S.log.length-1][0],avg7=mean(between(shift(last,-7),last)),prev7=mean(between(shift(last,-14),shift(last,-7)));
+  // trend = least-squares slope over the last 21 days, only once there's enough data to mean anything
+  const pts=S.log.filter(([d])=>d>shift(last,-21)).map(([d,k])=>[(new Date(d+'T12:00')-new Date(last+'T12:00'))/864e5,k]);
+  let rate=null;
+  if(pts.length>=8&&-pts[0][0]>=14){const mx=mean(pts.map(p=>p[0])),my=mean(pts.map(p=>p[1]));
+    rate=7*pts.reduce((a,[x,y])=>a+(x-mx)*(y-my),0)/pts.reduce((a,[x])=>a+(x-mx)**2,0)}
+  return {last,avg7,prev7,rate};
+}
 function targets(){
-  const m=S.me,bmr=10*m.w+6.25*m.h-5*m.age+(m.sex==='m'?5:-161),tdee=bmr*m.act;
-  const floor=m.sex==='m'?1500:1200,kcal=Math.max(floor,Math.round((tdee-500)/10)*10),deficit=tdee-kcal;
-  return {bmr,tdee,kcal,protein:Math.round(1.6*m.w),deficit,weeks:deficit>0?(m.w-m.goal)*7700/(deficit*7):Infinity};
+  const m=S.me,ws=wstats(),w=ws?ws.avg7:m.w,bmr=10*w+6.25*m.h-5*m.age+(m.sex==='m'?5:-161),tdee=bmr*m.act;
+  // lose at -500/day until the 7-day average reaches goal, then maintain (small correction if it drifts 1.5 kg over)
+  const base=m.reached?(w>m.goal+1.5?tdee-300:tdee):tdee-500;
+  const floor=m.sex==='m'?1500:1200,kcal=Math.max(floor,Math.round((base+m.adj)/10)*10),deficit=tdee-kcal;
+  return {w,bmr,tdee,kcal,protein:Math.round(1.6*w),deficit,maintain:m.reached,weeks:!m.reached&&deficit>0?(w-m.goal)*7700/(deficit*7):Infinity};
 }
 function base(){let t=macros(BF[S.plan.bf].ing);t=sum(t,macros(DAILY));if(S.plan.shake)t=sum(t,macros(SHAKE));return t}
 function days(){
   const b=base();
   return DAYS.map((d,i)=>{const [l,dn]=SLOTS[i],L=src(l),D=dn&&src(dn);let t=sum(b,pp(L));if(D)t=sum(t,pp(D));return {d,L,D,l,dn,t}});
 }
+// Spare from whole packs carries into next week, except things that won't last a week once opened.
+const PERISH=new Set(['lettuce','spinach','tomato','cucumber','avocado','capsicum','zucchini','cauli','eggplant','milk','yoghurt','pouch','feta','feta_rf','cottage','tofu','bread','apple','banana',
+  // tins and jars: the spare is an opened tin, which only keeps a few days
+  'evap','tuna','passata','pesto','corn','beansBlack','chickpeas','lentils','coconut','dicedtom','tompaste']);
 function shopping(){
   const p=S.plan,q={},add=(ing,x)=>{for(const k in ing)q[k]=(q[k]||0)+ing[k]*x};
   [p.tue,p.thu,p.sun,p.salad].forEach(id=>add(RB[id].ing,1));
   add(BF[p.bf].ing,7);add(DAILY,7);if(p.shake)add(SHAKE,7);
   let spend=0,used=0;const rows={};
-  for(const k in q){const d=ING[k],packs=Math.ceil(q[k]/d[6]-1e-9),aisle=d[10]?'Pantry':d[9];
+  for(const k in q){const d=ING[k],have=d[10]?0:Math.min(S.stock[k]||0,q[k]),packs=Math.ceil((q[k]-have)/d[6]-1e-9),aisle=d[10]?'Pantry':d[9];
     used+=q[k]/d[6]*price(k);if(!d[10])spend+=packs*price(k);
-    (rows[aisle]=rows[aisle]||[]).push({k,q:q[k],packs});}
+    (rows[aisle]=rows[aisle]||[]).push({k,q:q[k],packs,have,left:(S.stock[k]||0)+packs*d[6]-q[k]});}
   return {rows,spend,used};
+}
+function nextWeek(){
+  const sh=shopping(),stock={};
+  for(const a in sh.rows)for(const r of sh.rows[a])if(!ING[r.k][10]&&!PERISH.has(r.k)&&r.left>=1)stock[r.k]=Math.round(r.left);
+  for(const id of [S.plan.tue,S.plan.thu,S.plan.sun,S.plan.salad])S.picks[id]=(S.picks[id]||0)+1;
+  S.stock=stock;S.plan.last=S.plan.sun;S.ticks={};
 }
 
 /* ---------- Plan ---------- */
-function opts(list){return list.map(r=>{const m=pp(r);return [r.id,`${r.n} · ${Math.round(m[0])} kcal · ${Math.round(m[1])} g P · ${money(cpp(r))}${m[1]<40?' · lower protein':''}`]})}
-function sel(id,label,options,val,help){
-  return `<label class="field" for="${id}"><span>${label}</span><select id="${id}" data-plan="${id}">${options.map(([v,t])=>`<option value="${v}"${v==val?' selected':''}>${t}</option>`).join('')}</select><span class="hint">${help}</span></label>`;
+const pic=id=>IMG[id]?`<img class="thumb" src="${IMG[id]}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:'';
+const optTxt=r=>{const m=pp(r);return `${r.n} · ${Math.round(m[0])} kcal · ${Math.round(m[1])} g P · ${money(cpp(r))}${m[1]<40?' · lower protein':''}`};
+// Meals picked in past weeks go first, most-picked at the top
+function opts(list,val){
+  const o=r=>`<option value="${r.id}"${r.id==val?' selected':''}>${optTxt(r)}</option>`,fav=list.filter(r=>S.picks[r.id]).sort((a,b)=>S.picks[b.id]-S.picks[a.id]);
+  return fav.length?`<optgroup label="Your usual">${fav.map(o).join('')}</optgroup><optgroup label="All meals">${list.filter(r=>!S.picks[r.id]).map(o).join('')}</optgroup>`:list.map(o).join('');
+}
+function sel(id,label,html,help,imgId){
+  return `<label class="field" for="${id}"><span>${label}</span><select id="${id}" data-plan="${id}">${html}</select></label><div class="pick">${pic(imgId)}<span class="hint">${help}</span></div>`;
 }
 function renderPlan(){
-  const p=S.plan,t=targets(),ds=days(),full=ds.filter(x=>x.D),avg=full.reduce((a,x)=>sum(a,x.t),[0,0,0,0]).map(x=>x/full.length),sun=ds[5].t,sh=shopping();
+  const p=S.plan,t=targets(),ds=days(),avg=ds.reduce((a,x)=>sum(a,x.t),[0,0,0,0]).map(x=>x/7),sh=shopping();
   const kc=avg[0]-t.kcal,kcls=Math.abs(kc)<=150?'ok':kc>0?'bad':'warn';
   const pcls=avg[1]>=t.protein?'ok':'warn',bcls=sh.used<=S.me.budget?'ok':'bad';
   const batch=RECIPES.filter(r=>r.s===4),salads=RECIPES.filter(r=>r.s===1);
@@ -286,16 +493,16 @@ function renderPlan(){
     <div class="stat"><b class="${bcls}">${money(sh.used)}</b><span>food cost a week (budget ${money(+S.me.budget)})</span></div>
     <div class="stat"><b>${money(sh.spend)}</b><span>Tuesday shop in whole packs</span></div>
   </div>
-  <p class="hint">Food cost counts only what you eat, all meals and snacks included. The till total is higher in weeks you restock rice, cheese, yoghurt or onions, then lower while they last. Daily average covers the six days with a planned dinner. Sunday is ${Math.round(sun[0])} kcal before dinner, which leaves about ${Math.max(0,Math.round(t.kcal-sun[0]))} kcal for a dinner of your choice.</p>
-  ${sel('bf','Breakfast this week',[['eggs',`Eggs on toast · ${Math.round(macros(BF.eggs.ing)[0])} kcal · ${Math.round(macros(BF.eggs.ing)[1])} g P`],['oats',`Protein oats · ${Math.round(macros(BF.oats.ing)[0])} kcal · ${Math.round(macros(BF.oats.ing)[1])} g P`]],p.bf,'Every day, Tuesday to Monday.')}
-  ${sel('tue','Tuesday cook (dinner time)',opts(batch),p.tue,'Tue dinner, Wed lunch, Thu lunch, plus one frozen for Sat dinner.')}
-  ${sel('salad','Wednesday dinner (fresh salad)',opts(salads),p.salad,'Made fresh on Wednesday night, one large bowl.')}
-  ${sel('thu','Thursday cook (dinner time)',opts(batch),p.thu,'Thu dinner, Fri lunch and dinner, Sat lunch.')}
-  ${sel('sun','Sunday cook (lunch time)',opts(batch),p.sun,'Sun lunch, Mon lunch and dinner, plus one frozen for next Tuesday\'s lunch.')}
+  <p class="hint">Daily figures are the average over all 7 days, Sunday with no dinner. Food cost counts only what you eat, all meals and snacks included. The till total is higher in weeks you restock rice, cheese or onions, then lower while they last.</p>
+  ${sel('bf','Breakfast this week',Object.entries(BF).map(([k,b])=>`<option value="${k}"${k===p.bf?' selected':''}>${b.n} · ${Math.round(macros(b.ing)[0])} kcal · ${Math.round(macros(b.ing)[1])} g P</option>`).join(''),'Every day, Tuesday to Monday.',p.bf)}
+  ${sel('tue','Tuesday cook (dinner time)',opts(batch,p.tue),'Tue dinner, Wed lunch, Thu lunch, plus one frozen for Sat dinner.',p.tue)}
+  ${sel('salad','Wednesday dinner (fresh salad)',opts(salads,p.salad),'Made fresh on Wednesday night, one large bowl.',p.salad)}
+  ${sel('thu','Thursday cook (dinner time)',opts(batch,p.thu),'Thu dinner, Fri lunch and dinner, Sat lunch.',p.thu)}
+  ${sel('sun','Sunday cook (lunch time)',opts(batch,p.sun),'Sun lunch, Mon lunch and dinner, plus one frozen for next Tuesday\'s lunch.',p.sun)}
   <label class="switch" for="shake"><input type="checkbox" id="shake" ${p.shake?'checked':''}> Protein shake every day (30 g in water, ${Math.round(macros(SHAKE)[0])} kcal, ${Math.round(macros(SHAKE)[1])} g protein)</label>
-  ${sel('last','Tuesday lunch: frozen from last Sunday',opts(batch),p.last,'Set automatically when you start next week.')}
+  ${sel('last','Tuesday lunch: frozen from last Sunday',opts(batch,p.last),'Set automatically when you start next week.',p.last)}
   <h2>Next week</h2>
-  <p class="hint">When this week is done, tap below. This Sunday's meal becomes next Tuesday's lunch and the shopping ticks clear. Your choices stay as they are until you change them.</p>
+  <p class="hint">When this week is done, tap below. This Sunday's meal becomes next Tuesday's lunch, the meals you ate move up your "Your usual" list, spare rice, cheese, tins and frozen goods are taken off next week's shop, and the ticks clear.</p>
   <p class="row noprint"><button class="btn" id="nextweek">Start next week</button></p>`;
 }
 
@@ -303,11 +510,11 @@ function renderPlan(){
 function renderWeek(){
   const t=targets(),bf=BF[S.plan.bf].n;
   const rows=days().map(x=>{const c=x.D?(Math.abs(x.t[0]-t.kcal)<=150?'ok':x.t[0]>t.kcal?'bad':'warn'):'';
-    return `<tr><th>${x.d}</th><td>${x.l==='last'?'<small class="hint">Frozen · </small>':''}${x.L.n}</td><td>${x.dn&&x.dn.endsWith('*')?'<small class="hint">Frozen · </small>':''}${x.D?x.D.n:'<span class="hint">Your choice (not planned)</span>'}</td><td class="r ${c}">${Math.round(x.t[0])}</td><td class="r">${Math.round(x.t[1])}</td></tr>`}).join('');
+    return `<tr><th>${x.d}</th><td>${x.l==='last'?'<small class="hint">Frozen · </small>':''}${x.L.n}</td><td>${x.dn&&x.dn.endsWith('*')?'<small class="hint">Frozen · </small>':''}${x.D?x.D.n:'<span class="hint">No dinner</span>'}</td><td class="r ${c}">${Math.round(x.t[0])}</td><td class="r">${Math.round(x.t[1])}</td></tr>`}).join('');
   $('#tab-week').innerHTML=`<h1>Week at a glance</h1>
   <p class="sub">Every day also has ${bf.toLowerCase()}, an apple, a banana, a yoghurt pouch and 3 small coffees${S.plan.shake?', plus the shake':''}. Target ${t.kcal} kcal and ${t.protein} g protein.</p>
   <div class="tablewrap"><table><thead><tr><th>Day</th><th>Lunch</th><th>Dinner</th><th class="r">kcal</th><th class="r">Protein g</th></tr></thead><tbody>${rows}</tbody></table></div>
-  <p class="hint">Green is within 150 kcal of target. Red is over, amber is under.</p>
+  <p class="hint">Green is within 150 kcal of target. Red is over, amber is under. Sunday is meant to be lower.</p>
   <h2>Per portion</h2>
   <div class="tablewrap"><table><thead><tr><th>Meal</th><th class="r">kcal</th><th class="r">P</th><th class="r">C</th><th class="r">F</th><th class="r">Cost</th></tr></thead><tbody>
   ${[['Breakfast',{n:bf,ing:BF[S.plan.bf].ing,s:1}],['Snacks + coffees',{n:'Apple, banana, pouch, milk',ing:DAILY,s:1}],...(S.plan.shake?[['Shake',{n:'30 g in water',ing:SHAKE,s:1}]]:[]),['Tue cook',src('tue')],['Thu cook',src('thu')],['Wed salad',src('salad')],['Sun cook',src('sun')]]
@@ -320,20 +527,22 @@ function renderShop(){
   const sh=shopping();
   const block=a=>{const items=sh.rows[a];if(!items)return '';
     items.sort((x,y)=>ING[x.k][0].localeCompare(ING[y.k][0]));
-    return `<h2>${a==='Pantry'?'Check the pantry':a}</h2><ul class="shop">${items.map(({k,q,packs})=>{const d=ING[k],left=packs*d[6]-q;
-      const buy=a==='Pantry'?`Need ${amt(k,q)}${d[1]==='ea'?'':' this week'}. Buy a ${d[7]} if low.`:(d[1]==='ea'&&d[6]===1?`Buy ${packs}`:`Buy ${packs} × ${d[7]}`)+(left>0&&d[6]>1?` · ${amt(k,left)} spare`:'');
+    return `<h2>${a==='Pantry'?'Check the pantry':a}</h2><ul class="shop">${items.map(({k,q,packs,have,left})=>{const d=ING[k];
+      const buy=a==='Pantry'?`Need ${amt(k,q)}${d[1]==='ea'?'':' this week'}. Buy a ${d[7]} if low.`
+        :(have?`You have ${d[1]==='ea'?have:amt(k,have)} from last week. `:'')+(packs?(d[1]==='ea'&&d[6]===1?`Buy ${packs}`:`Buy ${packs} × ${d[7]}`):'Nothing to buy')+(packs&&left>0&&d[6]>1?` · ${amt(k,left)} spare${MEAT.includes(k)?', freeze it':''}`:'');
       return `<li><label for="t-${k}"><input type="checkbox" id="t-${k}" data-tick="${k}" ${S.ticks[k]?'checked':''}><span>${d[0]} <b>${d[1]==='ea'?q:amt(k,q)}</b><small>${buy}</small></span><span class="num">${a==='Pantry'?'':money(packs*price(k))}</span></label></li>`}).join('')}</ul>`};
   $('#tab-shop').innerHTML=`<h1>Tuesday shop</h1>
-  <p class="sub">Everything for Tue–Mon. Till total in whole packs ≈ <b>${money(sh.spend)}</b>. Food eaten this week ≈ ${money(sh.used)} (budget ${money(+S.me.budget)}). Skip anything already in the cupboard from last week.</p>
-  <p class="row noprint"><button class="btn ghost" id="clearticks">Clear ticks</button> <button class="btn ghost printbtn" onclick="print()">Print</button></p>
+  <p class="sub">Everything for Tue–Mon. Till total in whole packs ≈ <b>${money(sh.spend)}</b>. Food eaten this week ≈ ${money(sh.used)} (budget ${money(+S.me.budget)}).${Object.keys(S.stock).length?' Spares from last week are already taken off.':''}</p>
+  <p class="row noprint"><button class="btn ghost" id="clearticks">Clear ticks</button>${Object.keys(S.stock).length?' <button class="btn ghost" id="clearstock">Forget last week\'s spares</button>':''} <button class="btn ghost printbtn" onclick="print()">Print</button></p>
   ${AISLES.map(block).join('')}
   <p class="hint">Prices are Aldi Sydney estimates. Fix any that are wrong on the Me tab and every total updates. Tins are listed by drained weight.</p>`;
 }
 
 /* ---------- Cook ---------- */
 function ingList(r){return `<ul>${Object.entries(r.ing).map(([k,q])=>`<li>${ING[k][1]==='ea'?q+' × '+ING[k][0].toLowerCase():amt(k,q)+' '+ING[k][0].toLowerCase()}</li>`).join('')}</ul>`}
-function card(r,when,portion){const m=pp(r);return `<article class="card"><h3>${r.n}</h3><p class="meta">${when} · about ${r.min} min · makes ${r.s}</p>
-  <p class="macros">${line(m)} per portion</p><h4>Ingredients</h4>${ingList(r)}<h4>Method</h4><ol>${r.m.map(s=>`<li>${s}</li>`).join('')}</ol>${r.note?`<p class="note">${r.note}</p>`:''}<p class="portion">${portion}</p></article>`}
+function photo(id){const r=RB[id]||BF[id];return IMG[id]?`<figure class="hero"><img src="${IMG[id]}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"><figcaption>Photo: ${r.src[0]}</figcaption></figure>`:''}
+function card(r,when,portion){const m=pp(r);return `<article class="card">${photo(r.id)}<h3>${r.n}</h3><p class="meta">${when} · about ${r.min} min · makes ${r.s}</p>
+  <p class="macros">${line(m)} per portion</p><h4>Ingredients</h4>${ingList(r)}<h4>Method</h4><ol>${r.m.map(s=>`<li>${s}</li>`).join('')}</ol>${r.note?`<p class="note">${r.note}</p>`:''}${r.src?`<p class="note">Original recipe: <a href="${r.src[1]}" target="_blank" rel="noopener">${r.src[0]}</a></p>`:''}<p class="portion">${portion}</p></article>`}
 const raw=r=>MEAT.filter(k=>r.ing[k]).map(k=>`${amt(k,r.ing[k])} ${ING[k][0].toLowerCase()}`).join(' and ');
 function renderCook(){
   const tue=src('tue'),thu=src('thu'),sun=src('sun'),sal=src('salad'),b=BF[S.plan.bf];
@@ -357,7 +566,7 @@ function renderCook(){
   <h2>Monday night</h2>
   <p class="step">Move the frozen "Tue lunch" portion to the fridge.</p>
   <h2>Every morning</h2>
-  <article class="card"><h3>${b.n}</h3><p class="macros">${line(macros(b.ing))}</p><ol>${b.m.map(s=>`<li>${s}</li>`).join('')}</ol></article>
+  <article class="card">${photo(S.plan.bf)}<h3>${b.n}</h3><p class="macros">${line(macros(b.ing))}</p><ol>${b.m.map(s=>`<li>${s}</li>`).join('')}</ol></article>
   <h2>Food safety</h2>
   <ul class="hint">
    <li>Cool cooked food in shallow containers and get it in the fridge or freezer within 1 hour. Keep the fridge below 5°C.</li>
@@ -368,6 +577,60 @@ function renderCook(){
   </ul>`;
 }
 
+/* ---------- Weight ---------- */
+const dm=d=>d.slice(8)+'/'+d.slice(5,7);
+const kg=x=>x==null?'–':x.toFixed(1);
+const adjBtn=n=>`<button class="btn ghost" data-adj="${n}">${n<0?'Take':'Add'} ${Math.abs(n)} kcal ${n<0?'off':'to'} my target</button>`;
+function chart(){
+  const L=S.log.slice(-60);if(L.length<2)return '';
+  const W=340,H=170,l=34,r=8,b=22,tp=8,t0=new Date(L[0][0]+'T12:00'),day=d=>(new Date(d+'T12:00')-t0)/864e5,span=Math.max(1,day(L[L.length-1][0]));
+  const ys=L.map(x=>x[1]).concat(S.me.goal),lo=Math.floor(Math.min(...ys)-0.5),hi=Math.ceil(Math.max(...ys)+0.5);
+  const X=d=>(l+day(d)/span*(W-l-r)).toFixed(1),Y=k=>(tp+(hi-k)/(hi-lo)*(H-b-tp)).toFixed(1);
+  const avg=L.map(([d])=>`${X(d)},${Y(mean(between(shift(d,-7),d)))}`).join(' ');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight over the last ${L.length} weigh-ins">
+   ${[lo,hi].map(v=>`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" class="grid"/><text x="${l-6}" y="${+Y(v)+4}" text-anchor="end">${v}</text>`).join('')}
+   <line x1="${l}" x2="${W-r}" y1="${Y(S.me.goal)}" y2="${Y(S.me.goal)}" class="goal"/><text x="${W-r}" y="${+Y(S.me.goal)-4}" text-anchor="end" class="goaltxt">goal ${S.me.goal}</text>
+   ${L.map(([d,k])=>`<circle cx="${X(d)}" cy="${Y(k)}" r="2.5" class="dot"/>`).join('')}
+   <polyline points="${avg}" class="avg"/>
+   <text x="${l}" y="${H-6}">${dm(L[0][0])}</text><text x="${W-r}" y="${H-6}" text-anchor="end">${dm(L[L.length-1][0])}</text></svg>
+   <p class="hint">Dots are daily weigh-ins. The line is the 7-day average.</p>`;
+}
+function renderWeight(){
+  const ws=wstats(),t=targets(),m=S.me,today=iso(new Date()),rate=ws&&ws.rate;
+  let advice;
+  if(!ws)advice='Weigh yourself each morning after the toilet and before eating. Daily weight jumps around with water and salt; the 7-day average is the number that matters.';
+  else if(t.maintain){advice=`Goal reached. Your target is now maintenance, ${t.kcal} kcal a day, to keep the weight off.`;
+    if(rate!=null&&rate>0.2)advice+=` You're trending up ${rate.toFixed(2)} kg a week. ${adjBtn(-150)}`;
+    else if(rate!=null&&rate<-0.3)advice+=` You're still dropping ${(-rate).toFixed(2)} kg a week. ${adjBtn(150)}`;}
+  else if(rate==null)advice='Keep going. After 2 weeks with at least 8 weigh-ins the app works out your trend.';
+  else if(rate>-0.15)advice=`Your 3-week trend is flat (${rate>=0?'+':''}${rate.toFixed(2)} kg a week). Check portions are weighed, then if it's still flat: ${adjBtn(-150)}`;
+  else if(rate<-1)advice=`You're losing ${(-rate).toFixed(2)} kg a week. That's faster than planned and risks losing muscle. ${adjBtn(150)}`;
+  else advice=`On track: losing ${(-rate).toFixed(2)} kg a week.`;
+  if(m.adj)advice+=` <span class="hint">Your target includes a ${m.adj>0?'+':''}${m.adj} kcal adjustment.</span> <button class="btn ghost" data-adj="reset">Remove adjustment</button>`;
+  $('#tab-weight').innerHTML=`<h1>Weight</h1>
+  <p class="sub">${t.maintain?'Maintenance mode: keeping you at goal.':`Losing towards ${m.goal} kg. When your 7-day average reaches it, targets switch to maintenance.`}</p>
+  <div class="stats">
+   <div class="stat"><b>${kg(ws&&ws.avg7)}</b><span>7-day average (kg)</span></div>
+   <div class="stat"><b>${ws&&ws.prev7!=null?(ws.avg7-ws.prev7>0?'+':'')+(ws.avg7-ws.prev7).toFixed(1):'–'}</b><span>vs the week before (kg)</span></div>
+   <div class="stat"><b>${rate==null?'–':(rate>0?'+':'')+rate.toFixed(2)}</b><span>trend, kg a week (3 weeks)</span></div>
+   <div class="stat"><b>${ws?(t.maintain?'At goal':kg(Math.max(0,ws.avg7-m.goal))):'–'}</b><span>${t.maintain?'':'kg to go'}</span></div>
+  </div>
+  <div class="wform noprint"><label for="wdate" class="field"><span>Date</span><input type="date" id="wdate" value="${today}" max="${today}"></label>
+   <label for="wkg" class="field"><span>Weight (kg)</span><input type="number" id="wkg" inputmode="decimal" step="0.1" min="30" max="300" placeholder="e.g. 97.4"></label>
+   <button class="btn" id="wsave">Save</button></div>
+  <p id="wmsg" class="hint" role="status"></p>
+  <p>${advice}</p>
+  ${chart()}
+  ${S.log.length?`<h2>Recent weigh-ins</h2><ul class="entries">${S.log.slice(-14).reverse().map(([d,k])=>`<li><span>${dm(d)}</span><b class="num">${k.toFixed(1)} kg</b><button class="btn ghost" data-del="${d}" aria-label="Delete ${dm(d)}">Delete</button></li>`).join('')}</ul>`:''}`;
+}
+function saveWeight(){
+  const d=$('#wdate').value,k=+$('#wkg').value;
+  if(!d||!(k>=30&&k<=300)){$('#wmsg').textContent='Enter a weight between 30 and 300 kg.';return}
+  S.log=S.log.filter(x=>x[0]!==d).concat([[d,Math.round(k*10)/10]]).sort((a,b)=>a[0]<b[0]?-1:1);
+  const ws=wstats();if(!S.me.reached&&ws.avg7<=S.me.goal)S.me.reached=true;
+  save();renderAll();$('#wmsg').textContent=`Saved ${k.toFixed(1)} kg for ${dm(d)}.`;
+}
+
 /* ---------- Me ---------- */
 function renderMe(){
   const m=S.me,t=targets();
@@ -375,7 +638,7 @@ function renderMe(){
   $('#tab-me').innerHTML=`<h1>Me and my targets</h1>
   <div id="targets"></div>
   <label class="field" for="sex"><span>Sex (for the energy formula)</span><select id="sex" data-me="sex"><option value="m"${m.sex==='m'?' selected':''}>Male</option><option value="f"${m.sex==='f'?' selected':''}>Female</option></select></label>
-  ${num('age','Age',m.age)}${num('h','Height (cm)',m.h)}${num('w','Weight now (kg)',m.w,0.1)}${num('goal','Goal weight (kg)',m.goal,0.1)}
+  ${num('age','Age',m.age)}${num('h','Height (cm)',m.h)}${num('w','Starting weight (kg), used until you log weights',m.w,0.1)}${num('goal','Goal weight (kg)',m.goal,0.1)}
   <label class="field" for="act"><span>Activity</span><select id="act" data-me="act">${ACT.map(([v,l])=>`<option value="${v}"${v==m.act?' selected':''}>${l}</option>`).join('')}</select></label>
   ${num('budget','Weekly shop budget ($)',m.budget)}
   <h2>Aldi prices</h2>
@@ -397,21 +660,27 @@ function renderTargets(){
 }
 
 /* ---------- wiring ---------- */
-function renderAll(){renderPlan();renderWeek();renderShop();renderCook();renderTargets()}
+function renderAll(){renderPlan();renderWeek();renderShop();renderCook();renderWeight();renderTargets()}
 document.addEventListener('change',e=>{
   const el=e.target;
   if(el.dataset.plan){S.plan[el.dataset.plan]=el.dataset.plan==='bf'?el.value:+el.value;save();renderAll()}
   else if(el.id==='shake'){S.plan.shake=el.checked;save();renderAll()}
   else if(el.dataset.tick){S.ticks[el.dataset.tick]=el.checked;save()}
   else if(el.dataset.price){S.prices[el.dataset.price]=el.value;save();renderAll()}
-  else if(el.dataset.me){const k=el.dataset.me;S.me[k]=k==='sex'?el.value:+el.value;S.me.set=true;save();renderAll()}
+  else if(el.dataset.me){const k=el.dataset.me;S.me[k]=k==='sex'?el.value:+el.value;S.me.set=true;
+    if(k==='goal'){const ws=wstats();S.me.reached=!!ws&&ws.avg7<=S.me.goal}
+    save();renderAll()}
 });
 document.addEventListener('click',e=>{
   const t=e.target;
   if(t.dataset.tab){document.querySelectorAll('nav button').forEach(b=>b===t?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
     document.querySelectorAll('main>section').forEach(s=>s.hidden=s.id!=='tab-'+t.dataset.tab);window.scrollTo(0,0);try{localStorage.setItem('prep-tab',t.dataset.tab)}catch(err){}}
-  else if(t.id==='nextweek'){S.plan.last=S.plan.sun;S.ticks={};save();renderAll();t.textContent='Done. Next week started';}
+  else if(t.id==='nextweek'){nextWeek();save();renderAll();$('#nextweek').textContent='Done. Next week started'}
   else if(t.id==='clearticks'){S.ticks={};save();renderShop()}
+  else if(t.id==='clearstock'){S.stock={};save();renderAll()}
+  else if(t.id==='wsave')saveWeight();
+  else if(t.dataset.del){S.log=S.log.filter(x=>x[0]!==t.dataset.del);save();renderAll()}
+  else if(t.dataset.adj){S.me.adj=t.dataset.adj==='reset'?0:S.me.adj+ +t.dataset.adj;save();renderAll()}
   else if(t.id==='resetprices'){S.prices={};save();renderMe();renderAll()}
 });
 renderMe();renderAll();

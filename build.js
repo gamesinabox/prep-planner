@@ -11,11 +11,17 @@ ${fs.readFileSync(__dirname + '/app.html', 'utf8')}
 </body></html>`);
 fs.writeFileSync(d + '/manifest.webmanifest', JSON.stringify({ name: 'Aldi Prep Planner', short_name: 'Prep',
   start_url: './', display: 'standalone', background_color: '#f3f6f4', theme_color: '#1f6b4f' }));
-// Cache-first so it opens with no signal; refreshes the cache in the background when online.
-fs.writeFileSync(d + '/sw.js', `const C='prep-v2';
-self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest'])))});
+// Cache-first so it opens with no signal; refreshes its own files in the background when online.
+// Meal photos live on the recipe sites: saved once at install (opaque, no-cors) so they show offline too.
+const imgs = [...fs.readFileSync(__dirname + '/app.html', 'utf8').split('const IMG={')[1].split('};')[0].matchAll(/'(https:[^']+)'/g)].map(m => m[1]);
+fs.writeFileSync(d + '/sw.js', `const C='prep-v3',IMGS=${JSON.stringify(imgs)};
+self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest'])
+ .then(()=>Promise.all(IMGS.map(u=>fetch(u,{mode:'no-cors'}).then(r=>c.put(u,r)).catch(()=>{}))))))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;
- e.respondWith(caches.open(C).then(async c=>{const hit=await c.match(e.request,{ignoreSearch:true});
-  const net=fetch(e.request).then(r=>{if(r.ok)c.put(e.request,r.clone());return r}).catch(()=>hit);return hit||net}))});`);
+ const own=new URL(e.request.url).origin===location.origin;
+ e.respondWith(caches.open(C).then(async c=>{const hit=await c.match(e.request,{ignoreSearch:own});
+  if(hit&&!own)return hit;
+  const net=fetch(e.request).then(r=>{if(r.ok||r.type==='opaque')c.put(e.request,r.clone());return r}).catch(()=>hit);return hit||net}))});`);
+console.log(imgs.length + ' photos listed for offline');
 console.log('built ' + d);

@@ -7,11 +7,11 @@ const { ING, RECIPES, BF, macros } = new Function(data + ';return {ING,RECIPES,B
 const assert = require('assert');
 
 // Recipe bank table (High_Protein_Recipe_Bank.md), per portion: kcal, P, C, F
-const BANK = {1:[725,61,79,17],2:[622,58,72,9],3:[752,61,87,17],4:[657,62,67,14],5:[647,60,74,11],6:[652,59,75,11],
- 7:[784,63,88,20],8:[659,56,72,14],9:[666,54,75,14],10:[670,55,70,18],11:[684,58,72,16],12:[590,55,60,14],13:[704,50,80,21],
- 14:[735,52,77,25],15:[730,33,87,29],16:[627,51,87,10],17:[683,46,55,31],18:[703,43,76,28],19:[721,52,72,29],20:[637,47,70,17],
- 21:[668,61,66,18],22:[613,59,73,12],23:[657,64,53,22],24:[715,53,65,28],25:[710,61,44,38]};
+const BANK = {}; // every recipe is now a published one; the old bank comparison no longer applies
 
+const { IMG } = new Function(data + ';return {IMG}')();
+for (const r of [...RECIPES, ...Object.values(BF)]) assert(r.src, r.n + ': no source');
+for (const k of [...RECIPES.map(r => r.id), ...Object.keys(BF)]) assert(IMG[k], k + ': no photo');
 for (const r of [...RECIPES, ...Object.values(BF)])
   for (const k in r.ing) assert(ING[k], `${r.n}: unknown ingredient ${k}`);
 for (const k in ING) { const d = ING[k]; // catches typos; veg/spice carbs include fibre so 4/4/9 runs high there
@@ -20,7 +20,11 @@ for (const k in ING) { const d = ING[k]; // catches typos; veg/spice carbs inclu
 let worst = 0;
 console.log('id  name                                   app kcal/P/C/F        bank kcal/P/C/F   dKcal');
 for (const r of RECIPES) {
-  const m = macros(r.ing).map(x => Math.round(x / r.s)), b = BANK[r.id], dk = m[0] - b[0];
+  const m = macros(r.ing).map(x => Math.round(x / r.s)), b = BANK[r.id];
+  if (!b) { // published recipes added later: no bank figure, so check they are big, high-protein meals with a source
+    assert(r.src && m[0] >= 550 && m[0] <= 800 && m[1] >= 40, `${r.n}: ${m.join('/')} outside 550-800 kcal / 40 g+ protein, or no source`);
+    console.log(String(r.id).padEnd(4) + r.n.padEnd(39) + m.join('/').padEnd(22) + r.src[0]); continue; }
+  const dk = m[0] - b[0];
   worst = Math.max(worst, Math.abs(dk) / b[0]);
   console.log(String(r.id).padEnd(4) + r.n.padEnd(39) + m.join('/').padEnd(22) + b.join('/').padEnd(18) + dk);
 }
