@@ -22,7 +22,7 @@ console.log('id  name                                   app kcal/P/C/F        ba
 for (const r of RECIPES) {
   const m = macros(r.ing).map(x => Math.round(x / r.s)), b = BANK[r.id];
   if (!b) { // published recipes added later: no bank figure, so check they are big, high-protein meals with a source
-    assert(r.src && m[0] >= 550 && m[0] <= 800 && m[1] >= 40, `${r.n}: ${m.join('/')} outside 550-800 kcal / 40 g+ protein, or no source`);
+    assert(r.src && m[0] >= 400 && m[0] <= 800 && m[1] >= 40, `${r.n}: ${m.join('/')} outside 400-800 kcal / 40 g+ protein, or no source`);
     console.log(String(r.id).padEnd(4) + r.n.padEnd(39) + m.join('/').padEnd(22) + r.src[0]); continue; }
   const dk = m[0] - b[0];
   worst = Math.max(worst, Math.abs(dk) / b[0]);

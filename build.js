@@ -14,7 +14,10 @@ fs.writeFileSync(d + '/manifest.webmanifest', JSON.stringify({ name: 'Aldi Prep 
 // Cache-first so it opens with no signal; refreshes its own files in the background when online.
 // Meal photos live on the recipe sites: saved once at install (opaque, no-cors) so they show offline too.
 const imgs = [...fs.readFileSync(__dirname + '/app.html', 'utf8').split('const IMG={')[1].split('};')[0].matchAll(/'(https:[^']+)'/g)].map(m => m[1]);
-fs.writeFileSync(d + '/sw.js', `const C='prep-v4',IMGS=${JSON.stringify(imgs)};
+// The version stamp changes sw.js whenever the page changes, so phones install the update and reload.
+const ver = require('crypto').createHash('sha1').update(fs.readFileSync(d + '/index.html')).digest('hex').slice(0, 10);
+fs.writeFileSync(d + '/sw.js', `// version ${ver}
+const C='prep-v4',IMGS=${JSON.stringify(imgs)};
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest'].map(u=>new Request(u,{cache:'reload'})))
  .then(()=>Promise.all(IMGS.map(u=>fetch(u,{mode:'no-cors'}).then(r=>c.put(u,r)).catch(()=>{}))))))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
