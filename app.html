@@ -705,5 +705,11 @@ renderMe();renderAll();
 // print() is blocked inside an embedded viewer, so only show Print when running as its own page
 if(window.top!==window.self)document.head.insertAdjacentHTML('beforeend','<style>.printbtn{display:none}</style>');
 try{const tab=localStorage.getItem('prep-tab');if(tab)document.querySelector(`nav button[data-tab="${tab}"]`)?.click()}catch(e){}
-try{if('serviceWorker' in navigator&&window.top===window.self)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+// Home-screen apps resume rather than reload, so check for a new version each time the app comes back,
+// and reload once when a new version takes over (not on the very first install).
+try{if('serviceWorker' in navigator&&window.top===window.self){
+  const had=!!navigator.serviceWorker.controller;let done=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!done){done=true;location.reload()}});
+  navigator.serviceWorker.register('sw.js').then(reg=>document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})).catch(()=>{});
+}}catch(e){}
 </script>
