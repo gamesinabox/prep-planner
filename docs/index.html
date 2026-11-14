@@ -33,7 +33,7 @@ h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute
 p{margin:6px 0}
 .sub{color:var(--muted);font-size:13px;margin:0 0 10px}
 .num,table,.macros{font-variant-numeric:tabular-nums}
-nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(7,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
 nav button{appearance:none;border:0;background:none;color:var(--muted);font:600 13px var(--font);padding:12px 0 14px;cursor:pointer}
 nav button[aria-current="page"]{color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
 nav button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -44,7 +44,7 @@ nav button:focus-visible,button:focus-visible,select:focus-visible,input:focus-v
 .ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
 .field{display:grid;gap:4px;margin:14px 0 0}
 .field>span{font-weight:600}
-select,input{width:100%;font:16px var(--font);padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg)}
+select,input,textarea{width:100%;font:16px var(--font);padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg)}
 .hint{font-size:13px;color:var(--muted)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .btn{appearance:none;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:600 14px var(--font);padding:10px 14px;border-radius:8px;cursor:pointer}
@@ -75,12 +75,12 @@ td.r,th.r{text-align:right;white-space:nowrap}
 .chooser small,.opt small{display:block;color:var(--muted);font-size:13px;margin-top:2px;font-variant-numeric:tabular-nums}
 .chev{font-size:26px;line-height:1;color:var(--muted);padding-right:4px}
 .field .hint{margin:2px 0 0}
-#picker{padding:0;border:0;width:100%;max-width:720px;height:100%;max-height:100%;margin:0 auto;background:var(--bg);color:var(--fg)}
-#picker::backdrop{background:rgba(0,0,0,.45)}
-#picker header{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg);border-bottom:1px solid var(--line);
+#picker,#adder{padding:0;border:0;width:100%;max-width:720px;height:100%;max-height:100%;margin:0 auto;background:var(--bg);color:var(--fg)}
+#picker::backdrop,#adder::backdrop{background:rgba(0,0,0,.45)}
+#picker header,#adder header{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg);border-bottom:1px solid var(--line);
   padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
-#picker header h2{margin:0;font-size:17px}
-#picker .opts{padding:0 max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+#picker header h2,#adder header h2{margin:0;font-size:17px}
+#picker .opts,#adder .opts{padding:0 max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .opt{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;cursor:pointer}
 .opt .thumb{width:96px;height:96px}
 .opt.on b{color:var(--accent)}
@@ -106,12 +106,27 @@ td.r,th.r{text-align:right;white-space:nowrap}
 .entries .btn{padding:6px 10px;font-size:13px}
 .price{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
 .price input{padding:6px 8px;text-align:right}
+.daynav{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:center;margin-bottom:4px}
+.daynav h1{margin:0}
+.daynav .btn{font-size:22px;line-height:1;padding:6px 16px}
+.btn:disabled{opacity:.35;cursor:default}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--accent)}
+.bar.over i{background:var(--bad)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.fopt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;cursor:pointer}
+.fopt b{display:block;font-weight:600}
+.fopt small{display:block;color:var(--muted);font-size:13px;margin-top:2px;font-variant-numeric:tabular-nums}
+.entries li.two{grid-template-columns:1fr auto}
+.entries li small{display:block}
+textarea{resize:vertical}
 @media print{nav,.noprint{display:none!important}main{padding:0}.card{break-inside:avoid;border-color:#999}body{background:#fff;color:#000}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <main>
-  <section id="tab-plan"></section>
+  <section id="tab-today"></section>
+  <section id="tab-plan" hidden></section>
   <section id="tab-week" hidden></section>
   <section id="tab-shop" hidden></section>
   <section id="tab-cook" hidden></section>
@@ -119,8 +134,10 @@ td.r,th.r{text-align:right;white-space:nowrap}
   <section id="tab-me" hidden></section>
 </main>
 <dialog id="picker" aria-label="Choose a meal"></dialog>
+<dialog id="adder" aria-label="Add food"></dialog>
 <nav aria-label="Sections">
-  <button data-tab="plan" aria-current="page">Plan</button>
+  <button data-tab="today" aria-current="page">Today</button>
+  <button data-tab="plan">Plan</button>
   <button data-tab="week">Week</button>
   <button data-tab="shop">Shop</button>
   <button data-tab="cook">Cook</button>
@@ -464,8 +481,8 @@ const ACT=[[1.2,'Desk job, little exercise'],[1.375,'Light: about 10,000 steps a
 
 let S={plan:{bf:'eggs',tue:2,thu:8,sun:1,salad:22,shake:true,last:1},
        me:{sex:'m',age:40,h:178,w:85,goal:78,act:1.375,budget:110,set:false,adj:0,reached:false},
-       prices:{},ticks:{},log:[],stock:{},picks:{}};
-try{const s=JSON.parse(localStorage.getItem('prep-planner')||'null');if(s){Object.assign(S.plan,s.plan);Object.assign(S.me,s.me);for(const k of ['prices','ticks','log','stock','picks'])if(s[k])S[k]=s[k]}}catch(e){}
+       prices:{},ticks:{},log:[],stock:{},picks:{},food:{},myfoods:[]};
+try{const s=JSON.parse(localStorage.getItem('prep-planner')||'null');if(s){Object.assign(S.plan,s.plan);Object.assign(S.me,s.me);for(const k of ['prices','ticks','log','stock','picks','food','myfoods'])if(s[k])S[k]=s[k]}}catch(e){}
 const save=()=>{try{localStorage.setItem('prep-planner',JSON.stringify(S))}catch(e){}};
 
 const $=s=>document.querySelector(s);
@@ -725,6 +742,11 @@ function renderMe(){
   <p class="hint">Price per pack. Change any that differ at your Aldi.</p>
   ${Object.keys(ING).map(k=>`<label class="price" for="p-${k}"><span>${ING[k][0]}<br><small class="hint">${ING[k][7]}</small></span><input type="number" inputmode="decimal" step="0.01" id="p-${k}" data-price="${k}" value="${price(k).toFixed(2)}"></label>`).join('')}
   <p class="row noprint" style="margin-top:12px"><button class="btn ghost" id="resetprices">Reset prices</button></p>
+  <h2>Backup</h2>
+  <p class="hint">Your log, weights and settings live only on this phone. Copy a backup now and then and keep it in Notes. Meal photos are not included.</p>
+  <p class="row noprint"><button class="btn ghost" data-fbackup="copy">Copy backup</button></p>
+  <label class="field" for="frestore"><span>Restore from a backup</span><textarea id="frestore" rows="3" placeholder="Paste a copied backup here"></textarea></label>
+  <p class="row noprint"><button class="btn ghost" data-fbackup="restore">Restore</button></p><p id="fbmsg" class="hint" role="status"></p>
   <h2>How the numbers are worked out</h2>
   <p class="hint">Each meal's macros are added up from its ingredients by weight: meat, fish and veg raw; rice, pasta, noodles and oats dry; tins drained. Nutrition comes from USDA-style reference values per 100 g, so they are estimates. Your packet labels win, especially for sausages, tofu, yoghurt pouches and coconut milk. Oil, sauces, cheese and dressings are counted; anything extra you add is not.</p>`;
   renderTargets();
@@ -739,8 +761,160 @@ function renderTargets(){
    <p class="hint">Mifflin-St Jeor estimate minus 500 kcal a day, which is a steady, sustainable rate. Weigh yourself at the same time each morning and go by the weekly average. If it stalls for 3 weeks, drop the activity setting one level. Recheck these numbers every 5 kg.</p>`;
 }
 
+/* ---------- Today: food diary ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const r1=x=>Math.round(x*10)/10;
+const fday=d=>S.food[d]||[];
+const fsum=es=>es.reduce((a,e)=>sum(a,[e.k,e.p,e.c,e.f]),[0,0,0,0]);
+const dayIdx=d=>(new Date(d+'T12:00').getDay()+5)%7; // the plan week runs Tuesday to Monday
+const dlabel=d=>{const t=iso(new Date());return d===t?'Today':d===shift(t,-1)?'Yesterday':new Date(d+'T12:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'short'})};
+const entry=(n,m,pl)=>{const e={n,k:r1(m[0]),p:r1(m[1]),c:r1(m[2]),f:r1(m[3])};if(pl)e.pl=pl;return e};
+const SLOTNAME={bf:'Breakfast',l:'Lunch',d:'Dinner',sn:'Snacks',sh:'Shake'};
+let viewDay=iso(new Date());
+const FUI={mode:'search',q:'',sel:null,msg:'',recent:[]};
+
+// The meals the plan has for that weekday, so a prepped day is a few taps.
+function plannedFor(d){
+  const x=days()[dayIdx(d)],p=S.plan,o=[{key:'bf',n:BF[p.bf].n,m:macros(BF[p.bf].ing)}];
+  if(x.L)o.push({key:'l',n:x.L.n,m:pp(x.L)});
+  if(x.D)o.push({key:'d',n:x.D.n,m:pp(x.D)});
+  o.push({key:'sn',n:'Snacks and coffee',m:macros(DAILY)});
+  if(p.shake)o.push({key:'sh',n:'Protein shake',m:macros(SHAKE)});
+  return o;
+}
+function addEntry(d,e){(S.food[d]=S.food[d]||[]).push(e);save()}
+
+function renderToday(){
+  const el=$('#tab-today');if(!el)return;
+  const t=targets(),es=fday(viewDay),tot=fsum(es),left=t.kcal-tot[0],today=iso(new Date());
+  const pl=plannedFor(viewDay),done=new Set(es.map(e=>e.pl).filter(Boolean));
+  const pct=(a,b)=>Math.min(100,Math.max(0,a/b*100)).toFixed(0);
+  const yest=fday(shift(viewDay,-1));
+  const wk=[...Array(7)].map((_,i)=>shift(today,i-6)).filter(d=>fday(d).length).map(d=>[d,fsum(fday(d))]);
+  const fin=wk.filter(([d])=>d<today),avg=fin.length?fin.reduce((a,[,s])=>a+s[0],0)/fin.length:null;
+  el.innerHTML=`
+  <div class="daynav noprint"><button class="btn ghost" data-fday="-1" aria-label="Previous day">‹</button><h1>${dlabel(viewDay)}</h1><button class="btn ghost" data-fday="1" aria-label="Next day" ${viewDay>=today?'disabled':''}>›</button></div>
+  <p class="sub" style="text-align:center">Target ${t.kcal} kcal and ${t.protein} g protein a day. Change it on the Me tab.</p>
+  <div class="stats">
+   <div class="stat"><b class="${left<0?'bad':'ok'}">${Math.abs(Math.round(left))}</b><span>kcal ${left<0?'over':'left'} (${Math.round(tot[0])} eaten)</span><div class="bar ${left<0?'over':''}"><i style="width:${pct(tot[0],t.kcal)}%"></i></div></div>
+   <div class="stat"><b class="${tot[1]>=t.protein?'ok':'warn'}">${Math.round(tot[1])} g</b><span>protein (aim ${t.protein} g+)</span><div class="bar"><i style="width:${pct(tot[1],t.protein)}%"></i></div></div>
+  </div>
+  <p class="hint">${Math.round(tot[2])} g carbs · ${Math.round(tot[3])} g fat · ${kj(tot[0])} kJ</p>
+  <p class="row noprint"><button class="btn" data-fopen="search">+ Add food</button><button class="btn ghost" data-fopen="quick">Quick add</button>${!es.length&&yest.length?`<button class="btn ghost" data-fcopy>Copy ${viewDay===today?'yesterday':'the day before'}</button>`:''}</p>
+  <h2>From your plan</h2>
+  <ul class="entries">${pl.map(x=>`<li class="two"><span><b>${esc(x.n)}</b><small class="hint">${SLOTNAME[x.key]} · ${Math.round(x.m[0])} kcal · ${Math.round(x.m[1])} g protein</small></span>${done.has(x.key)?'<span class="tick" aria-label="Logged">✓</span>':`<button class="btn ghost" data-fplan="${x.key}">Log</button>`}</li>`).join('')}</ul>
+  ${pl.some(x=>!done.has(x.key))?'<p class="row noprint"><button class="btn ghost" data-fplan="all">Log everything not yet logged</button></p>':''}
+  <h2>Eaten ${es.length?`(${es.length})`:''}</h2>
+  ${es.length?`<ul class="entries">${es.map((e,i)=>`<li><span><b>${esc(e.n)}</b><small class="hint">${Math.round(e.k)} kcal · ${Math.round(e.p)} g protein · ${Math.round(e.c)} g carbs · ${Math.round(e.f)} g fat</small></span><button class="btn ghost" data-fagain="${i}" aria-label="Log ${esc(e.n)} again">Again</button><button class="btn ghost" data-fdel="${i}" aria-label="Delete ${esc(e.n)}">Delete</button></li>`).join('')}</ul>`:'<p class="hint">Nothing logged yet. Tap a meal above, or add food.</p>'}
+  ${wk.length?`<h2>Last 7 days</h2>
+  <div class="tablewrap"><table><thead><tr><th>Day</th><th class="r">kcal</th><th class="r">Protein g</th></tr></thead><tbody>${wk.map(([d,s])=>`<tr><td>${dm(d)}${d===today?' (today)':''}</td><td class="r">${Math.round(s[0])}</td><td class="r">${Math.round(s[1])}</td></tr>`).join('')}</tbody></table></div>
+  <p class="hint">${avg==null?'The average appears once a day has finished.':`Average of ${fin.length} finished day${fin.length>1?'s':''}: ${Math.round(avg)} kcal against a target of ${t.kcal}. Only count days you logged everything.`}</p>`:''}`;
+}
+
+/* ----- add-food dialog: search, quick add, amount ----- */
+const adderEl=()=>$('#adder');
+function openAdder(mode){FUI.mode=mode||'search';FUI.q='';FUI.sel=null;FUI.msg='';renderAdder();const d=adderEl();if(!d.open)d.showModal()}
+function fitems(q){
+  q=q.trim().toLowerCase();const all=[],hit=n=>!q||n.toLowerCase().includes(q);
+  if(!q){const seen=new Set();FUI.recent=[];
+    for(let i=0;i<14;i++)for(const e of [...fday(shift(iso(new Date()),-i))].reverse())if(!seen.has(e.n)&&FUI.recent.length<8){seen.add(e.n);FUI.recent.push(e)}
+    FUI.recent.forEach((e,i)=>all.push({id:'recent:'+i,n:e.n,s:`${Math.round(e.k)} kcal · ${Math.round(e.p)} g protein`,g:'Recent (one tap)'}));}
+  S.myfoods.filter(f=>hit(f.n)).forEach(f=>all.push({id:'my:'+f.id,n:f.n,s:`per serve: ${Math.round(f.k)} kcal · ${Math.round(f.p)} g protein`,g:'My foods'}));
+  RECIPES.filter(r=>hit(r.n)).forEach(r=>{const m=pp(r);all.push({id:'rec:'+r.id,n:r.n,s:`1 portion: ${Math.round(m[0])} kcal · ${Math.round(m[1])} g protein`,g:'Recipes'})});
+  Object.entries(BF).filter(([,b])=>hit(b.n)).forEach(([k,b])=>{const m=macros(b.ing);all.push({id:'bf:'+k,n:b.n,s:`1 serve: ${Math.round(m[0])} kcal · ${Math.round(m[1])} g protein`,g:'Breakfasts'})});
+  Object.entries(ING).filter(([,d])=>hit(d[0])).forEach(([k,d])=>all.push({id:'ing:'+k,n:d[0],s:d[1]==='ea'?`each: ${d[2]} kcal · ${d[3]} g protein`:`per 100 ${d[1]}: ${d[2]} kcal · ${d[3]} g protein`,g:'Ingredients'}));
+  return all;
+}
+function adderList(){
+  let g='',h='';
+  for(const it of fitems(FUI.q).slice(0,60)){if(it.g!==g){g=it.g;h+=`<h4>${g}</h4>`}
+    h+=`<button class="fopt" data-fpick="${esc(it.id)}"><span><b>${esc(it.n)}</b><small>${esc(it.s)}</small></span><span class="chev">›</span></button>`}
+  return h||'<p class="hint">Nothing matches. Use Quick add to type the numbers from the packet.</p>';
+}
+function fsel(id){
+  const i=id.indexOf(':'),k=id.slice(0,i),v=id.slice(i+1);
+  if(k==='ing'){const d=ING[v],ea=d[1]==='ea';
+    return {id,n:d[0],def:ea?1:100,label:ea?'How many?':`Amount (${d[1]}), raw or dry as bought`,per:q=>macros({[v]:q}),nm:q=>ea?`${q} × ${d[0]}`:`${d[0]} ${amt(v,q)}`}}
+  if(k==='rec'){const r=RB[+v];return {id,n:r.n,def:1,label:'Portions (1 = one full meal-prep portion)',per:q=>pp(r).map(x=>x*q),nm:q=>q===1?r.n:`${r.n} × ${q}`}}
+  if(k==='bf'){const b=BF[v];return {id,n:b.n,def:1,label:'Serves',per:q=>macros(b.ing).map(x=>x*q),nm:q=>q===1?b.n:`${b.n} × ${q}`}}
+  if(k==='my'){const f=S.myfoods.find(x=>String(x.id)===v);if(!f)return null;
+    return {id,n:f.n,mine:f.id,def:1,label:'Servings',per:q=>[f.k,f.p,f.c,f.f].map(x=>x*q),nm:q=>q===1?f.n:`${f.n} × ${q}`}}
+  return null;
+}
+function renderAdder(){
+  const d=adderEl(),head=t=>`<header><h2>${esc(t)}</h2><button class="btn ghost" data-fdone>Done</button></header>`;
+  const seg=m=>`<div class="seg"><button class="btn${m==='search'?'':' ghost'}" data-fmode="search">Search</button><button class="btn${m==='quick'?'':' ghost'}" data-fmode="quick">Quick add</button></div>`;
+  let body;
+  if(FUI.mode==='quick'){
+    const f=(id,l,ph,mode)=>`<label class="field" for="${id}"><span>${l}</span><input id="${id}" ${mode?`type="number" inputmode="decimal" step="any" min="0"`:'type="text"'} placeholder="${ph}"></label>`;
+    body=head('Add food')+`<div class="opts">${seg('quick')}${FUI.msg?`<p class="step" role="status">${esc(FUI.msg)}</p>`:''}
+      ${f('qn','Name (optional)','e.g. Muesli bar')}${f('qk','Calories (kcal)','from the packet',1)}${f('qp','Protein (g)','0',1)}${f('qc','Carbs (g)','0',1)}${f('qf','Fat (g)','0',1)}
+      <label class="switch" for="qsave"><input type="checkbox" id="qsave"> Save to My foods (these numbers are per serve)</label>
+      <p id="qerr" class="warn" role="alert"></p><p class="row"><button class="btn" data-fquick>Add to ${dlabel(viewDay).toLowerCase()}</button></p></div>`;
+  }else if(FUI.mode==='amount'&&FUI.sel){
+    const s=FUI.sel;
+    body=head(s.n)+`<div class="opts"><p class="row"><button class="btn ghost" data-fback>‹ Back</button></p>
+      <label class="field" for="famt"><span>${esc(s.label)}</span><input id="famt" type="number" inputmode="decimal" step="any" min="0" value="${s.def}"></label>
+      <p id="fprev" class="macros">${line(s.per(s.def))}</p>
+      <p class="row"><button class="btn" data-fadd>Add to ${dlabel(viewDay).toLowerCase()}</button>${s.mine?'<button class="btn ghost" data-fremove>Remove from My foods</button>':''}</p></div>`;
+  }else{
+    body=head('Add food')+`<div class="opts">${seg('search')}${FUI.msg?`<p class="step" role="status">${esc(FUI.msg)}</p>`:''}
+      <label class="field" for="fq"><span class="sr">Search foods</span><input id="fq" type="search" placeholder="Search foods, recipes, ingredients" value="${esc(FUI.q)}" autocomplete="off"></label>
+      <div id="fres">${adderList()}</div></div>`;
+  }
+  d.innerHTML=body;
+}
+const num=id=>{const v=document.getElementById(id).value.trim();return v===''?0:+v};
+function fquick(){
+  const n=document.getElementById('qn').value.trim(),k=num('qk'),p=num('qp'),c=num('qc'),f=num('qf'),err=document.getElementById('qerr');
+  if(!(k>0&&k<=5000)){err.textContent='Enter calories between 1 and 5000.';return}
+  if([p,c,f].some(x=>!(x>=0&&x<=1000))){err.textContent='Protein, carbs and fat must be between 0 and 1000 g.';return}
+  if(document.getElementById('qsave').checked){if(!n){err.textContent='Give it a name to save it.';return}
+    S.myfoods.push({id:Date.now(),n,k,p,c,f})}
+  addEntry(viewDay,entry(n||'Quick add',[k,p,c,f]));
+  FUI.msg=`Added ${n||'Quick add'} (${Math.round(k)} kcal).`;renderAdder();renderToday();
+}
+function backup(act){
+  const msg=$('#fbmsg'),box=$('#frestore');
+  if(act==='copy'){const j=JSON.stringify(S);
+    (navigator.clipboard?navigator.clipboard.writeText(j):Promise.reject()).then(()=>{msg.textContent='Backup copied. Paste it into Notes or a message to yourself.'})
+      .catch(()=>{box.value=j;box.select();msg.textContent='Could not copy automatically. The backup is in the box: select all and copy it.'})}
+  else{let o;try{o=JSON.parse(box.value)}catch(e){}
+    if(!o||typeof o!=='object'||!o.plan||!o.me){msg.textContent='That does not look like a backup. Paste the whole copied text.';return}
+    if(!confirm('Replace everything on this phone with the pasted backup?'))return;
+    try{localStorage.setItem('prep-planner',JSON.stringify(o));location.reload()}catch(e){msg.textContent='Could not restore on this phone.'}}
+}
+document.addEventListener('click',e=>{
+  const d=adderEl();
+  if(e.target===d){d.close();return}
+  const c=e.target.closest('[data-fday],[data-fplan],[data-fagain],[data-fdel],[data-fcopy],[data-fopen],[data-fpick],[data-fmode],[data-fback],[data-fadd],[data-fdone],[data-fquick],[data-fremove],[data-fbackup]');
+  if(!c)return;const ds=c.dataset;
+  if('fday' in ds){const n=shift(viewDay,+ds.fday);if(n<=iso(new Date())){viewDay=n;renderToday()}}
+  else if('fplan' in ds){const pl=plannedFor(viewDay),have=new Set(fday(viewDay).map(x=>x.pl));
+    for(const x of pl)if((ds.fplan==='all'||ds.fplan===x.key)&&!have.has(x.key))addEntry(viewDay,entry(x.n,x.m,x.key));renderToday()}
+  else if('fagain' in ds){const o=fday(viewDay)[+ds.fagain];if(o){const {pl,...rest}=o;addEntry(viewDay,rest);renderToday()}}
+  else if('fdel' in ds){const a=fday(viewDay);a.splice(+ds.fdel,1);if(!a.length)delete S.food[viewDay];save();renderToday()}
+  else if('fcopy' in ds){for(const o of fday(shift(viewDay,-1))){const {pl,...rest}=o;addEntry(viewDay,rest)}renderToday()}
+  else if('fopen' in ds)openAdder(ds.fopen);
+  else if('fmode' in ds){FUI.mode=ds.fmode;FUI.msg='';renderAdder()}
+  else if('fback' in ds){FUI.mode='search';FUI.sel=null;renderAdder()}
+  else if('fdone' in ds){d.close()}
+  else if('fpick' in ds){const id=ds.fpick;
+    if(id.startsWith('recent:')){const o=FUI.recent[+id.slice(7)];if(o){const {pl,...rest}=o;addEntry(viewDay,rest);FUI.msg=`Added ${o.n}.`;renderAdder();renderToday()}}
+    else{const s=fsel(id);if(s){FUI.sel=s;FUI.mode='amount';renderAdder()}}}
+  else if('fadd' in ds){const q=+document.getElementById('famt').value;if(!(q>0))return;const s=FUI.sel;
+    addEntry(viewDay,entry(s.nm(q),s.per(q)));FUI.msg=`Added ${s.nm(q)}.`;FUI.mode='search';FUI.q='';FUI.sel=null;renderAdder();renderToday()}
+  else if('fremove' in ds){S.myfoods=S.myfoods.filter(x=>x.id!==FUI.sel.mine);save();FUI.mode='search';FUI.sel=null;renderAdder()}
+  else if('fquick' in ds)fquick();
+  else if('fbackup' in ds)backup(ds.fbackup);
+});
+document.addEventListener('input',e=>{const t=e.target;
+  if(t.id==='fq'){FUI.q=t.value;document.getElementById('fres').innerHTML=adderList()}
+  else if(t.id==='famt'&&FUI.sel){const q=+t.value;document.getElementById('fprev').textContent=q>0?line(FUI.sel.per(q)):''}});
+adderEl().addEventListener('close',renderToday);
+
 /* ---------- wiring ---------- */
-function renderAll(){renderPlan();renderWeek();renderShop();renderCook();renderWeight();renderTargets()}
+function renderAll(){renderToday();renderPlan();renderWeek();renderShop();renderCook();renderWeight();renderTargets()}
 document.addEventListener('change',e=>{
   const el=e.target;
   if(el.id==='shake'){S.plan.shake=el.checked;save();renderAll()}
